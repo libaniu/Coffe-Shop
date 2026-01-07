@@ -1,14 +1,11 @@
 import type { NextConfig } from "next";
 
-// HAPUS ": NextConfig" SETELAH NAMA VARIABEL
-const nextConfig = { 
-  /* config options here */
+// Hapus ": NextConfig" di baris ini
+const nextConfig = {
   typescript: {
-    // Abaikan error TS saat build
     ignoreBuildErrors: true,
   },
   eslint: {
-    // Abaikan error ESLint saat build
     ignoreDuringBuilds: true,
   },
 };

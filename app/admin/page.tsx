@@ -62,9 +62,6 @@ export default function AdminDashboard() {
   // --- FUNGSI AMBIL DATA ---
   const fetchMenu = async () => {
     try {
-      // Tambahkan baris ini untuk simulasi loading 1 detik
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       const res = await fetch("/api/menu");
       const data = await res.json();
       setMenuList(Array.isArray(data) ? data : []);
@@ -212,8 +209,7 @@ export default function AdminDashboard() {
   const executeBulkStatus = async () => {
     const status = bulkModal.targetStatus;
     try {
-      const res = await fetch("/api/menu", {
-        // Gunakan endpoint PATCH masal kamu
+      const res = await fetch("/api/menu/bulk", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isAvailable: status }),
@@ -334,13 +330,13 @@ export default function AdminDashboard() {
         <div className="flex gap-4 mb-6 px-2">
           <button
             onClick={() => setBulkModal({ show: true, targetStatus: true })}
-            className="flex-1 py-4 bg-green-50 text-green-700 rounded-2xl text-xs font-bold uppercase tracking-widest border border-green-100 hover:bg-green-600 hover:text-white transition-all"
+            className="flex-1 py-4 bg-green-50 text-green-700 rounded-2xl text-xs font-bold uppercase tracking-widest border border-green-100 hover:bg-green-600 hover:text-white transition-all shadow-sm"
           >
             ✅ In Stock
           </button>
           <button
             onClick={() => setBulkModal({ show: true, targetStatus: false })}
-            className="flex-1 py-4 bg-red-50 text-red-700 rounded-2xl text-xs font-bold uppercase tracking-widest border border-red-100 hover:bg-red-600 hover:text-white transition-all"
+            className="flex-1 py-4 bg-red-50 text-red-700 rounded-2xl text-xs font-bold uppercase tracking-widest border border-red-100 hover:bg-red-600 hover:text-white transition-all shadow-sm"
           >
             🚫 Sold Out
           </button>
@@ -383,7 +379,7 @@ export default function AdminDashboard() {
               [...Array(3)].map((_, i) => (
                 <div
                   key={i}
-                  className="bg-white p-5 rounded-[2rem] shadow-sm border border-stone-200 animate-pulse"
+                  className="bg-white p-5 rounded-4lx shadow-sm border border-stone-200 animate-pulse"
                 >
                   <div className="h-4 bg-stone-200 rounded w-3/4 mb-4"></div>
                   <div className="h-8 bg-stone-100 rounded-full w-24 mb-6"></div>
@@ -397,7 +393,7 @@ export default function AdminDashboard() {
               filteredMenu.map((item) => (
                 <div
                   key={item._id}
-                  className="bg-white p-5 rounded-[2rem] shadow-sm border border-stone-200"
+                  className="bg-white p-5 rounded-4xl shadow-sm border border-stone-200"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>
@@ -464,54 +460,86 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-50">
-                {filteredMenu.map((item) => (
-                  <tr
-                    key={item._id}
-                    className="hover:bg-stone-50/50 transition-colors"
-                  >
-                    <td className="px-6 py-4 font-bold text-stone-800">
-                      {item.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-stone-500">
-                      {item.category}
-                    </td>
-                    <td className="px-6 py-4 text-amber-800 font-bold">
-                      Rp {Number(item.price).toLocaleString("id-ID")}
-                    </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => toggleStatus(item)}
-                        className={`px-4 py-1 rounded-full text-[10px] font-bold uppercase transition-all ${
-                          item.isAvailable
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {item.isAvailable ? "Tersedia" : "Sold Out"}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 flex gap-2">
-                      <button
-                        onClick={() => openEditModal(item)}
-                        className="bg-amber-50 text-amber-700 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() =>
-                          setDeleteModal({
-                            show: true,
-                            id: item._id!,
-                            name: item.name,
-                          })
-                        }
-                        className="bg-red-50 text-red-500 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase"
-                      >
-                        Hapus
-                      </button>
+                {isLoading ? (
+                  [...Array(5)].map((_, i) => (
+                    <tr key={i} className="animate-pulse">
+                      <td className="px-6 py-4">
+                        <div className="h-4 bg-stone-200 rounded w-24"></div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 bg-stone-100 rounded w-16"></div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-4 bg-stone-100 rounded w-20"></div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="h-6 bg-stone-100 rounded-full w-20"></div>
+                      </td>
+                      <td className="px-6 py-4 flex gap-2">
+                        <div className="h-8 bg-stone-200 rounded-full w-14"></div>
+                        <div className="h-8 bg-stone-200 rounded-full w-14"></div>
+                      </td>
+                    </tr>
+                  ))
+                ) : filteredMenu.length > 0 ? (
+                  filteredMenu.map((item) => (
+                    <tr
+                      key={item._id}
+                      className="hover:bg-stone-50/50 transition-colors"
+                    >
+                      <td className="px-6 py-4 font-bold text-stone-800">
+                        {item.name}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-stone-500">
+                        {item.category}
+                      </td>
+                      <td className="px-6 py-4 text-amber-800 font-bold">
+                        Rp {Number(item.price).toLocaleString("id-ID")}
+                      </td>
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => toggleStatus(item)}
+                          className={`px-4 py-1 rounded-full text-[10px] font-bold uppercase transition-all ${
+                            item.isAvailable
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}
+                        >
+                          {item.isAvailable ? "Tersedia" : "Sold Out"}
+                        </button>
+                      </td>
+                      <td className="px-6 py-4 flex gap-2">
+                        <button
+                          onClick={() => openEditModal(item)}
+                          className="bg-amber-50 text-amber-700 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() =>
+                            setDeleteModal({
+                              show: true,
+                              id: item._id!,
+                              name: item.name,
+                            })
+                          }
+                          className="bg-red-50 text-red-500 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase"
+                        >
+                          Hapus
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="text-center py-20 italic text-stone-400"
+                    >
+                      Menu tidak ditemukan.
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
@@ -533,7 +561,16 @@ export default function AdminDashboard() {
             </div>
           </div>
           <div className="space-y-3">
-            {logs.length === 0 ? (
+            {isLoading ? (
+              [...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-5 bg-white border border-stone-200 rounded-4xl animate-pulse"
+                >
+                  <div className="h-4 bg-stone-200 rounded w-48"></div>
+                </div>
+              ))
+            ) : logs.length === 0 ? (
               <p className="text-center py-10 text-stone-300 italic text-sm">
                 Belum ada aktivitas tercatat.
               </p>
@@ -575,7 +612,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* MODALS (Edit, Delete, Bulk, Success) - Sesuaikan dengan kode kamu sebelumnya */}
+      {/* MODAL EDIT */}
       {isEditModalOpen && editingData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-sm">
           <div className="bg-white rounded-[3rem] p-8 md:p-10 max-w-2xl w-full shadow-2xl">
@@ -627,15 +664,23 @@ export default function AdminDashboard() {
                     ))}
                 </select>
               </div>
-              <div className="h-44 rounded-3xl bg-stone-50 overflow-hidden border-2 border-dashed border-stone-200 mb-4 flex items-center justify-center">
-                {editImagePreview ? (
-                  <img
-                    src={editImagePreview}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <p className="text-xs text-stone-400 italic">No Image</p>
-                )}
+              <div>
+                <div className="h-44 rounded-3xl bg-stone-50 overflow-hidden border-2 border-dashed border-stone-200 mb-4 flex items-center justify-center">
+                  {editImagePreview ? (
+                    <img
+                      src={editImagePreview}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <p className="text-xs text-stone-400 italic">No Image</p>
+                  )}
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="text-[10px]"
+                  onChange={(e) => handleImageUpload(e, "edit")}
+                />
               </div>
             </div>
             <div className="flex gap-4 mt-10">
@@ -656,6 +701,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* MODAL DELETE */}
       {deleteModal.show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-stone-900/60 backdrop-blur-sm">
           <div className="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl">
@@ -685,6 +731,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* BULK ACTION MODAL */}
       {bulkModal.show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-stone-900/60 backdrop-blur-md">
           <div className="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl">
@@ -705,7 +752,7 @@ export default function AdminDashboard() {
             <div className="flex flex-col gap-3">
               <button
                 onClick={executeBulkStatus}
-                className={`w-full py-4 text-white rounded-2xl font-bold ${
+                className={`w-full py-4 text-white rounded-2xl font-bold shadow-lg ${
                   bulkModal.targetStatus ? "bg-green-600" : "bg-red-600"
                 }`}
               >
@@ -713,7 +760,7 @@ export default function AdminDashboard() {
               </button>
               <button
                 onClick={() => setBulkModal({ ...bulkModal, show: false })}
-                className="w-full py-4 bg-stone-100 rounded-2xl"
+                className="w-full py-4 bg-stone-100 text-stone-600 rounded-2xl font-bold"
               >
                 Batal
               </button>
@@ -722,8 +769,9 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      {/* SUCCESS MODALS */}
       {(showSuccessModal || showUpdateSuccessModal) && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-stone-900/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-6 bg-stone-900/60 backdrop-blur-sm">
           <div className="bg-white rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl">
             <h3 className="text-xl font-bold text-[#2d241e] mb-8">
               Berhasil Disimpan!

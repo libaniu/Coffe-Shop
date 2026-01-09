@@ -3,7 +3,13 @@ import mongoose from "mongoose";
 const MenuSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    price: { type: Number, required: true },
+    // MENGGANTI price (Number) menjadi variants (Array of Objects)
+    variants: [
+      {
+        label: { type: String, required: true }, // Contoh: "Hot", "Iced (Medium)", "Iced (Large)"
+        price: { type: Number, required: true }, // Contoh: 25000, 28000, 32000
+      },
+    ],
     category: { type: String, required: true },
     desc: { type: String },
     img: { type: String },

@@ -12,7 +12,6 @@ const Hero = () => {
           alt="Ruang Nadi Ambiance"
           src="/img/cafe.webp"
           fill
-          priority
           className="object-cover object-center scale-105"
         />
         

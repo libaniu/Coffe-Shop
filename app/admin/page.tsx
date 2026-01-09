@@ -448,7 +448,7 @@ export default function AdminDashboard() {
              </div>
 
              {/* DESKTOP VIEW ORDERS */}
-             <div className="hidden md:block bg-white rounded-[2rem] shadow-sm border border-stone-100 overflow-hidden">
+             <div className="hidden md:block bg-white rounded-4xl shadow-sm border border-stone-100 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-stone-50 border-b border-stone-100 text-xs font-bold uppercase tracking-widest text-stone-500">
@@ -520,7 +520,7 @@ export default function AdminDashboard() {
               </div>
               <div className="bg-stone-50 w-full md:w-80 p-8 flex flex-col justify-between border-l border-stone-100">
                  <div>
-                    <div className="aspect-square rounded-[2rem] bg-white overflow-hidden mb-4 relative group border-4 border-white shadow-sm">
+                    <div className="aspect-square rounded-4xl bg-white overflow-hidden mb-4 relative group border-4 border-white shadow-sm">
                        {editImagePreview ? <img src={editImagePreview} className="w-full h-full object-cover"/> : <div className="p-10 text-center italic text-stone-300 flex items-center justify-center h-full">No Image</div>}
                        <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                           <span className="text-white text-xs font-bold bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">Ganti Foto</span>
@@ -538,9 +538,9 @@ export default function AdminDashboard() {
       )}
 
       {/* Delete & Success Modals */}
-      {deleteModal.show && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl"><h3 className="text-xl font-bold mb-2">Hapus Menu?</h3><p className="text-stone-500 mb-6 text-sm">Hapus "{deleteModal.name}" secara permanen?</p><div className="flex gap-3"><button onClick={() => setDeleteModal({show:false,id:"",name:""})} className="flex-1 py-3 bg-stone-100 rounded-xl font-bold">Batal</button><button onClick={confirmDelete} className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold">Hapus</button></div></div></div>)}
-      {showSuccessModal && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white px-10 py-8 rounded-[2rem] shadow-2xl flex flex-col items-center animate-in zoom-in-95"><div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl mb-4">✓</div><h3 className="text-lg font-bold text-stone-800 mb-6">Berhasil Disimpan!</h3><button onClick={() => setShowSuccessModal(false)} className="px-8 py-3 bg-stone-800 text-white rounded-xl font-bold text-sm">OK</button></div></div>)}
-      {bulkModal.show && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl"><h3 className="text-xl font-bold mb-4">Konfirmasi Status</h3><p className="text-stone-500 mb-6 text-sm">Ubah SEMUA menu jadi {bulkModal.targetStatus ? "Available" : "Sold Out"}?</p><div className="flex gap-3"><button onClick={() => setBulkModal({...bulkModal, show:false})} className="flex-1 py-3 bg-stone-100 rounded-xl font-bold">Batal</button><button onClick={executeBulkStatus} className="flex-1 py-3 bg-[#2d241e] text-white rounded-xl font-bold">Ya</button></div></div></div>)}
+      {deleteModal.show && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white rounded-4xl p-8 max-w-sm w-full text-center shadow-2xl"><h3 className="text-xl font-bold mb-2">Hapus Menu?</h3><p className="text-stone-500 mb-6 text-sm">Hapus "{deleteModal.name}" secara permanen?</p><div className="flex gap-3"><button onClick={() => setDeleteModal({show:false,id:"",name:""})} className="flex-1 py-3 bg-stone-100 rounded-xl font-bold">Batal</button><button onClick={confirmDelete} className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold">Hapus</button></div></div></div>)}
+      {showSuccessModal && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white px-10 py-8 rounded-4xl shadow-2xl flex flex-col items-center animate-in zoom-in-95"><div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl mb-4">✓</div><h3 className="text-lg font-bold text-stone-800 mb-6">Berhasil Disimpan!</h3><button onClick={() => setShowSuccessModal(false)} className="px-8 py-3 bg-stone-800 text-white rounded-xl font-bold text-sm">OK</button></div></div>)}
+      {bulkModal.show && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white rounded-4xl p-8 max-w-sm w-full text-center shadow-2xl"><h3 className="text-xl font-bold mb-4">Konfirmasi Status</h3><p className="text-stone-500 mb-6 text-sm">Ubah SEMUA menu jadi {bulkModal.targetStatus ? "Available" : "Sold Out"}?</p><div className="flex gap-3"><button onClick={() => setBulkModal({...bulkModal, show:false})} className="flex-1 py-3 bg-stone-100 rounded-xl font-bold">Batal</button><button onClick={executeBulkStatus} className="flex-1 py-3 bg-[#2d241e] text-white rounded-xl font-bold">Ya</button></div></div></div>)}
 
     </div>
   );

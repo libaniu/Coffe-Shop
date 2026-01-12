@@ -186,7 +186,7 @@ export default function OrderStatusPage({
             href="/"
             className="block w-full py-4 bg-stone-800 text-white text-center rounded-xl font-bold text-sm hover:bg-stone-900 transition-all"
           >
-            ← Pesan Lagi / Kembali ke Menu
+            ← Kembali ke website
           </Link>
           <div className="text-center">
             <p className="text-[10px] text-stone-400">

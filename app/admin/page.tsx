@@ -228,7 +228,7 @@ export default function AdminDashboard() {
     printWindow.document.close();
   };
 
-// --- EXPORT EXCEL (DENGAN FORMAT LEBAR KOLOM) ---
+  // --- EXPORT EXCEL (DENGAN FORMAT LEBAR KOLOM) ---
   const downloadExcel = () => {
     if (!orders || orders.length === 0) return alert("Belum ada data pesanan untuk di-download.");
 
@@ -351,18 +351,36 @@ export default function AdminDashboard() {
                      <tr><th className="px-8 py-6">Menu</th><th className="px-6 py-6">Kategori</th><th className="px-6 py-6">Harga Dasar</th><th className="px-6 py-6">Status</th><th className="px-6 py-6 text-right">Aksi</th></tr>
                   </thead>
                   <tbody className="divide-y divide-stone-50">
-                     {filteredMenu.map(item => (
-                       <tr key={item._id} className="hover:bg-stone-50/50">
-                          <td className="px-8 py-4 flex items-center gap-4"><div className="w-12 h-12 rounded-xl bg-stone-100 overflow-hidden"><img src={item.img} className="w-full h-full object-cover"/></div><span className="font-bold text-stone-800">{item.name}</span></td>
-                          <td className="px-6 py-4 text-sm text-stone-500">{item.category}</td>
-                          <td className="px-6 py-4 font-bold text-amber-800">Rp {item.variants?.[0]?.price.toLocaleString("id-ID")}</td>
-                          <td className="px-6 py-4"><button onClick={() => toggleStatus(item)} className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${item.isAvailable ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{item.isAvailable ? "Ready" : "Sold Out"}</button></td>
-                          <td className="px-6 py-4 text-right space-x-2">
-                             <button onClick={() => { setEditingData({...item}); setEditImagePreview(item.img); setIsEditModalOpen(true); }} className="px-4 py-2 bg-amber-50 text-amber-700 rounded-xl text-[10px] font-bold">Edit</button>
-                             <button onClick={() => setDeleteModal({ show: true, id: item._id!, name: item.name })} className="px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold">Hapus</button>
-                          </td>
-                       </tr>
-                     ))}
+                     {/* --- SKELETON LOADING MENU --- */}
+                     {isLoadingMenu ? (
+                       [...Array(5)].map((_, i) => (
+                         <tr key={i} className="animate-pulse">
+                           <td className="px-8 py-4">
+                             <div className="flex items-center gap-4">
+                               <div className="w-12 h-12 bg-stone-200 rounded-xl"></div>
+                               <div className="h-4 w-32 bg-stone-200 rounded"></div>
+                             </div>
+                           </td>
+                           <td className="px-6 py-4"><div className="h-4 w-20 bg-stone-200 rounded"></div></td>
+                           <td className="px-6 py-4"><div className="h-4 w-24 bg-stone-200 rounded"></div></td>
+                           <td className="px-6 py-4"><div className="h-6 w-16 bg-stone-200 rounded-full"></div></td>
+                           <td className="px-6 py-4"><div className="h-8 w-20 bg-stone-200 rounded ml-auto"></div></td>
+                         </tr>
+                       ))
+                     ) : (
+                       filteredMenu.map(item => (
+                         <tr key={item._id} className="hover:bg-stone-50/50">
+                            <td className="px-8 py-4 flex items-center gap-4"><div className="w-12 h-12 rounded-xl bg-stone-100 overflow-hidden"><img src={item.img} className="w-full h-full object-cover"/></div><span className="font-bold text-stone-800">{item.name}</span></td>
+                            <td className="px-6 py-4 text-sm text-stone-500">{item.category}</td>
+                            <td className="px-6 py-4 font-bold text-amber-800">Rp {item.variants?.[0]?.price.toLocaleString("id-ID")}</td>
+                            <td className="px-6 py-4"><button onClick={() => toggleStatus(item)} className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase ${item.isAvailable ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>{item.isAvailable ? "Ready" : "Sold Out"}</button></td>
+                            <td className="px-6 py-4 text-right space-x-2">
+                               <button onClick={() => { setEditingData({...item}); setEditImagePreview(item.img); setIsEditModalOpen(true); }} className="px-4 py-2 bg-amber-50 text-amber-700 rounded-xl text-[10px] font-bold">Edit</button>
+                               <button onClick={() => setDeleteModal({ show: true, id: item._id!, name: item.name })} className="px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold">Hapus</button>
+                            </td>
+                         </tr>
+                       ))
+                     )}
                   </tbody>
                </table>
             </div>
@@ -403,7 +421,24 @@ export default function AdminDashboard() {
 
              {/* MOBILE VIEW ORDERS */}
              <div className="md:hidden space-y-4">
-                {isLoadingOrders ? (<p className="text-center text-stone-400 py-10">Memuat...</p>) : orders?.length === 0 ? (<div className="text-center py-10 bg-white rounded-3xl border border-stone-100"><p className="text-stone-400 italic">Belum ada pesanan.</p></div>) : orders?.map((order) => (
+                {/* SKELETON LOADING MOBILE */}
+                {isLoadingOrders ? (
+                   [...Array(3)].map((_, i) => (
+                     <div key={i} className="p-6 rounded-3xl shadow-sm border border-stone-100 bg-white animate-pulse">
+                        <div className="flex justify-between mb-4">
+                           <div className="h-4 w-20 bg-stone-200 rounded"></div>
+                           <div className="h-4 w-24 bg-stone-200 rounded"></div>
+                        </div>
+                        <div className="space-y-2">
+                           <div className="h-4 w-full bg-stone-200 rounded"></div>
+                           <div className="h-4 w-2/3 bg-stone-200 rounded"></div>
+                        </div>
+                     </div>
+                   ))
+                ) : orders?.length === 0 ? (
+                    <div className="text-center py-10 bg-white rounded-3xl border border-stone-100"><p className="text-stone-400 italic">Belum ada pesanan.</p></div>
+                ) : (
+                    orders?.map((order) => (
                    <div key={order._id} className={`p-6 rounded-3xl shadow-sm border flex flex-col gap-4 ${order.status === 'completed' ? 'bg-stone-50 border-stone-100 opacity-70' : 'bg-white border-stone-200'}`}>
                       <div className="flex justify-between items-start border-b border-stone-100 pb-3">
                          <div><span className="text-[10px] font-black uppercase text-stone-400 tracking-widest">Order ID</span><p className="font-mono text-xs text-stone-600 font-bold">{order.orderId}</p></div>
@@ -444,7 +479,8 @@ export default function AdminDashboard() {
                          <p className="text-lg font-black text-stone-800">Rp {(order.totalPrice || 0).toLocaleString("id-ID")}</p>
                       </div>
                    </div>
-                ))}
+                ))
+               )}
              </div>
 
              {/* DESKTOP VIEW ORDERS */}
@@ -455,7 +491,26 @@ export default function AdminDashboard() {
                       <tr><th className="p-6">Order ID</th><th className="p-6">Tanggal</th><th className="p-6">Customer</th><th className="p-6">Items</th><th className="p-6">Total</th><th className="p-6 text-center">Status</th><th className="p-6 text-center">Print</th></tr>
                     </thead>
                     <tbody className="divide-y divide-stone-50">
-                      {isLoadingOrders ? (<tr><td colSpan={7} className="p-10 text-center text-stone-400">Memuat data pesanan...</td></tr>) : orders?.length === 0 ? (<tr><td colSpan={7} className="p-10 text-center text-stone-400">Belum ada pesanan masuk.</td></tr>) : orders?.map((order) => (
+                      {/* --- SKELETON LOADING ORDERS (DESKTOP) --- */}
+                      {isLoadingOrders ? (
+                        [...Array(5)].map((_, i) => (
+                          <tr key={i} className="animate-pulse">
+                            <td className="p-6"><div className="h-4 w-20 bg-stone-200 rounded"></div></td>
+                            <td className="p-6"><div className="h-4 w-24 bg-stone-200 rounded"></div></td>
+                            <td className="p-6">
+                               <div className="h-4 w-32 bg-stone-200 rounded mb-2"></div>
+                               <div className="h-3 w-20 bg-stone-100 rounded"></div>
+                            </td>
+                            <td className="p-6"><div className="h-4 w-40 bg-stone-200 rounded"></div></td>
+                            <td className="p-6"><div className="h-4 w-24 bg-stone-200 rounded"></div></td>
+                            <td className="p-6 text-center"><div className="h-6 w-20 bg-stone-200 rounded-full mx-auto"></div></td>
+                            <td className="p-6 text-center"><div className="h-8 w-8 bg-stone-200 rounded mx-auto"></div></td>
+                          </tr>
+                        ))
+                      ) : orders?.length === 0 ? (
+                        <tr><td colSpan={7} className="p-10 text-center text-stone-400">Belum ada pesanan masuk.</td></tr>
+                      ) : (
+                        orders?.map((order) => (
                         <tr key={order._id} className={`hover:bg-stone-50/50 transition-colors ${order.status === 'completed' ? 'opacity-60 bg-stone-50' : ''}`}>
                           <td className="p-6 font-mono text-xs text-stone-400">{order.orderId}</td>
                           <td className="p-6 text-sm text-stone-600">{new Date(order.createdAt).toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</td>
@@ -482,7 +537,8 @@ export default function AdminDashboard() {
                              <button onClick={() => handlePrint(order)} className="w-10 h-10 rounded-xl bg-stone-100 text-stone-600 flex items-center justify-center hover:bg-stone-800 hover:text-white transition-all shadow-sm">🖨️</button>
                           </td>
                         </tr>
-                      ))}
+                      ))
+                     )}
                     </tbody>
                   </table>
                 </div>
@@ -520,7 +576,7 @@ export default function AdminDashboard() {
               </div>
               <div className="bg-stone-50 w-full md:w-80 p-8 flex flex-col justify-between border-l border-stone-100">
                  <div>
-                    <div className="aspect-square rounded-4xl bg-white overflow-hidden mb-4 relative group border-4 border-white shadow-sm">
+                    <div className="aspect-square rounded-[2rem] bg-white overflow-hidden mb-4 relative group border-4 border-white shadow-sm">
                        {editImagePreview ? <img src={editImagePreview} className="w-full h-full object-cover"/> : <div className="p-10 text-center italic text-stone-300 flex items-center justify-center h-full">No Image</div>}
                        <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                           <span className="text-white text-xs font-bold bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">Ganti Foto</span>
@@ -538,9 +594,9 @@ export default function AdminDashboard() {
       )}
 
       {/* Delete & Success Modals */}
-      {deleteModal.show && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white rounded-4xl p-8 max-w-sm w-full text-center shadow-2xl"><h3 className="text-xl font-bold mb-2">Hapus Menu?</h3><p className="text-stone-500 mb-6 text-sm">Hapus "{deleteModal.name}" secara permanen?</p><div className="flex gap-3"><button onClick={() => setDeleteModal({show:false,id:"",name:""})} className="flex-1 py-3 bg-stone-100 rounded-xl font-bold">Batal</button><button onClick={confirmDelete} className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold">Hapus</button></div></div></div>)}
-      {showSuccessModal && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white px-10 py-8 rounded-4xl shadow-2xl flex flex-col items-center animate-in zoom-in-95"><div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl mb-4">✓</div><h3 className="text-lg font-bold text-stone-800 mb-6">Berhasil Disimpan!</h3><button onClick={() => setShowSuccessModal(false)} className="px-8 py-3 bg-stone-800 text-white rounded-xl font-bold text-sm">OK</button></div></div>)}
-      {bulkModal.show && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white rounded-4xl p-8 max-w-sm w-full text-center shadow-2xl"><h3 className="text-xl font-bold mb-4">Konfirmasi Status</h3><p className="text-stone-500 mb-6 text-sm">Ubah SEMUA menu jadi {bulkModal.targetStatus ? "Available" : "Sold Out"}?</p><div className="flex gap-3"><button onClick={() => setBulkModal({...bulkModal, show:false})} className="flex-1 py-3 bg-stone-100 rounded-xl font-bold">Batal</button><button onClick={executeBulkStatus} className="flex-1 py-3 bg-[#2d241e] text-white rounded-xl font-bold">Ya</button></div></div></div>)}
+      {deleteModal.show && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl"><h3 className="text-xl font-bold mb-2">Hapus Menu?</h3><p className="text-stone-500 mb-6 text-sm">Hapus "{deleteModal.name}" secara permanen?</p><div className="flex gap-3"><button onClick={() => setDeleteModal({show:false,id:"",name:""})} className="flex-1 py-3 bg-stone-100 rounded-xl font-bold">Batal</button><button onClick={confirmDelete} className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold">Hapus</button></div></div></div>)}
+      {showSuccessModal && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white px-10 py-8 rounded-[2rem] shadow-2xl flex flex-col items-center animate-in zoom-in-95"><div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl mb-4">✓</div><h3 className="text-lg font-bold text-stone-800 mb-6">Berhasil Disimpan!</h3><button onClick={() => setShowSuccessModal(false)} className="px-8 py-3 bg-stone-800 text-white rounded-xl font-bold text-sm">OK</button></div></div>)}
+      {bulkModal.show && (<div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm"><div className="bg-white rounded-[2rem] p-8 max-w-sm w-full text-center shadow-2xl"><h3 className="text-xl font-bold mb-4">Konfirmasi Status</h3><p className="text-stone-500 mb-6 text-sm">Ubah SEMUA menu jadi {bulkModal.targetStatus ? "Available" : "Sold Out"}?</p><div className="flex gap-3"><button onClick={() => setBulkModal({...bulkModal, show:false})} className="flex-1 py-3 bg-stone-100 rounded-xl font-bold">Batal</button><button onClick={executeBulkStatus} className="flex-1 py-3 bg-[#2d241e] text-white rounded-xl font-bold">Ya</button></div></div></div>)}
 
     </div>
   );

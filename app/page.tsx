@@ -21,10 +21,21 @@ export default function Home() {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // --- PAGINATION STATE (BARU) ---
+  // --- PAGINATION STATE ---
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9; // Tampilkan 9 menu per halaman
+
+  // 👇 --- FIX: LOGIC AGAR TIDAK SCROLL SAAT REFRESH ---
+  const isFirstRender = useRef(true); // Penanda apakah ini render pertama
+
   useEffect(() => {
+    // Cek: Jika ini adalah render pertama (baru buka/refresh), hentikan di sini.
+    if (isFirstRender.current) {
+      isFirstRender.current = false; // Set jadi false agar klik berikutnya (halaman 2 dst) bisa jalan
+      return; 
+    }
+
+    // Kode di bawah ini hanya jalan kalau user KLIK tombol pagination
     if (typeof window !== "undefined") {
       const menuSection = document.getElementById("menu");
       if (menuSection) {
@@ -32,6 +43,7 @@ export default function Home() {
       }
     }
   }, [currentPage]);
+  // 👆 --- END FIX ---
 
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
 
@@ -64,7 +76,7 @@ export default function Home() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // --- RESET HALAMAN JIKA FILTER BERUBAH (BARU) ---
+  // --- RESET HALAMAN JIKA FILTER BERUBAH ---
   // Kalau user ganti kategori atau cari menu, kembalikan ke halaman 1
   useEffect(() => {
     setCurrentPage(1);
@@ -101,7 +113,7 @@ export default function Home() {
       return 0;
     });
 
-  // --- PAGINATION LOGIC (BARU) ---
+  // --- PAGINATION LOGIC ---
   // 2. HITUNG INDEKS DATA UNTUK HALAMAN SAAT INI
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -343,12 +355,12 @@ export default function Home() {
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
                       className={`w-10 h-10 rounded-full font-bold text-sm transition-all shadow-sm
-                                    ${
-                                      currentPage === pageNum
-                                        ? "bg-[#2d241e] text-white scale-110 shadow-md"
-                                        : "bg-white text-stone-500 border border-stone-200 hover:border-amber-600"
-                                    }
-                                `}
+                                          ${
+                                            currentPage === pageNum
+                                              ? "bg-[#2d241e] text-white scale-110 shadow-md"
+                                              : "bg-white text-stone-500 border border-stone-200 hover:border-amber-600"
+                                          }
+                                        `}
                     >
                       {pageNum}
                     </button>

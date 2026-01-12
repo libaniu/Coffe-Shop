@@ -116,15 +116,6 @@ const CartSidebar = ({
           </div>
           
           <div className="flex gap-4 items-center">
-             {/* Tombol Hapus Semua */}
-             {cartItems.length > 0 && onClearCart && (
-                <button
-                onClick={onClearCart}
-                className="text-[10px] font-bold uppercase text-red-500 hover:text-red-700 transition-colors tracking-widest"
-                >
-                Hapus Semua
-                </button>
-            )}
             {/* Tombol Close (X) */}
             <button
               onClick={onClose}

@@ -29,7 +29,7 @@ const Navbar = ({ totalItems, onOpenCart }) => {
     >
       <div className="flex justify-between items-center px-6 md:px-8 max-w-7xl mx-auto">
         {/* Logo - Berubah warna saat scroll */}
-        <div className={`text-2xl font-serif font-bold tracking-tighter transition-colors duration-300 ${
+        <div className={`text-2xgl font-serif font-bold tracking-tighter transition-colors duration-300 ${
           isScrolled ? "text-white" : "text-white"
         }`}>
           RUANG<span className="text-amber-500">NADI</span>

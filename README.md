@@ -1,21 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ☕ Ruang Nadi Web
 
-## Getting Started
+Aplikasi web modern untuk manajemen Coffee Shop (Customer Ordering & Admin Dashboard) yang dibangun dengan **Next.js 14**.
 
-First, run the development server:
+## 🚀 Fitur Utama
+* **Customer:** Katalog menu, pencarian, keranjang belanja, & pembayaran via **Midtrans**.
+* **Admin Dashboard:** Kelola menu (CRUD), monitoring pesanan real-time, cetak struk thermal, & export laporan Excel.
+* **Tech:** Responsive Mobile-First, TypeScript, & Tailwind CSS.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🛠️ Tech Stack
+* Next.js (App Router)
+* TypeScript & Tailwind CSS
+* SWR (Data Fetching)
+* MongoDB & Midtrans Gateway
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📦 Cara Menjalankan
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1.  **Clone & Install**
+    ```bash
+    git clone https://github.com/libaniu/Coffe-Shop.git
+    cd coffe-shop
+    npm install
+    ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2.  **Setup Environment**
+    Buat file `.env` dan masukkan konfigurasi Database & Midtrans.
+
+3.  **Jalankan Project**
+    ```bash
+    npm run dev
+    ```
+    Buka `http://localhost:3000` di browser.

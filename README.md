@@ -1,11 +1,13 @@
 # ☕ Ruang Nadi Web
-
 Aplikasi manajemen Coffee Shop (Customer Ordering & Admin Dashboard) berbasis **Next.js 14**.
 
 ## 🚀 Fitur Utama
-- **Customer:** Katalog Menu, Cart, Search, & Pembayaran (Midtrans).
-- **Admin:** Kelola Menu, Monitoring Order Real-time, Print Struk, & Export Excel.
+* **Customer:** Katalog menu, pencarian, keranjang belanja, & pembayaran via **Midtrans**.
+* **Admin Dashboard:** Kelola menu (CRUD), monitoring pesanan real-time, cetak struk thermal, & export laporan Excel.
+* **Tech:** Responsive Mobile-First, TypeScript, & Tailwind CSS.
 
 ## 🛠️ Tech Stack
-- **Core:** Next.js (App Router), TypeScript, Tailwind CSS.
-- **Data & Tools:** MongoDB, SWR (Fetch), XLSX (Excel), Midtrans Snap.
+* Next.js (App Router)
+* TypeScript & Tailwind CSS
+* SWR (Data Fetching)
+* MongoDB & Midtrans Gateway

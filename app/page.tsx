@@ -32,7 +32,7 @@ export default function Home() {
     // Cek: Jika ini adalah render pertama (baru buka/refresh), hentikan di sini.
     if (isFirstRender.current) {
       isFirstRender.current = false; // Set jadi false agar klik berikutnya (halaman 2 dst) bisa jalan
-      return; 
+      return;
     }
 
     // Kode di bawah ini hanya jalan kalau user KLIK tombol pagination
@@ -92,8 +92,10 @@ export default function Home() {
     { label: "Harga: Tertinggi", value: "price-high", icon: "Rp ↓" },
   ];
 
+  const safeMenuList = Array.isArray(menuList) ? menuList : [];
+
   // 1. FILTER & SORT DATA DULU
-  const filteredAndSortedMenu = (menuList || [])
+  const filteredAndSortedMenu = safeMenuList
     .filter((item: any) => {
       const matchesCategory =
         activeCategory === "All" || item.category === activeCategory;
@@ -121,7 +123,7 @@ export default function Home() {
   // 3. AMBIL DATA YANG AKAN DITAMPILKAN SAJA (SLICE)
   const currentItems = filteredAndSortedMenu.slice(
     indexOfFirstItem,
-    indexOfLastItem
+    indexOfLastItem,
   );
 
   // 4. HITUNG TOTAL HALAMAN
@@ -134,7 +136,7 @@ export default function Home() {
       const existing = prev.find((i) => i.cartItemId === cartItemId);
       if (existing) {
         return prev.map((i) =>
-          i.cartItemId === cartItemId ? { ...i, qty: i.qty + 1 } : i
+          i.cartItemId === cartItemId ? { ...i, qty: i.qty + 1 } : i,
         );
       }
       return [
@@ -169,24 +171,24 @@ export default function Home() {
             toast.type === "success"
               ? "bg-white border-emerald-500 text-emerald-800"
               : toast.type === "warning"
-              ? "bg-white border-amber-500 text-amber-800"
-              : "bg-white border-rose-500 text-rose-800"
+                ? "bg-white border-amber-500 text-amber-800"
+                : "bg-white border-rose-500 text-rose-800"
           }`}
         >
           <span className="text-3xl">
             {toast.type === "success"
               ? "✅"
               : toast.type === "warning"
-              ? "⏳"
-              : "❌"}
+                ? "⏳"
+                : "❌"}
           </span>
           <div className="flex flex-col">
             <span className="font-bold text-lg">
               {toast.type === "success"
                 ? "Berhasil!"
                 : toast.type === "warning"
-                ? "Perhatian"
-                : "Gagal"}
+                  ? "Perhatian"
+                  : "Gagal"}
             </span>
             <span className="text-sm text-stone-500 font-medium">
               {toast.message}
@@ -406,9 +408,9 @@ export default function Home() {
           setCart((prev) =>
             prev
               .map((i) =>
-                i.cartItemId === cartItemId ? { ...i, qty: i.qty - 1 } : i
+                i.cartItemId === cartItemId ? { ...i, qty: i.qty - 1 } : i,
               )
-              .filter((i) => i.qty > 0)
+              .filter((i) => i.qty > 0),
           )
         }
         onRemove={(cartItemId: any) =>

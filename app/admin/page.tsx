@@ -75,6 +75,7 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [orderSearchTerm, setOrderSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("");
+  const [filterStatus, setFilterStatus] = useState("Semua");
   const categories = ["Semua", "Coffee", "Non-Coffee", "Pastry", "Food"];
 
   // Modals
@@ -125,13 +126,21 @@ export default function AdminDashboard() {
   // --- FILTER ORDERS ---
   const filteredOrders =
     orders?.filter((order) => {
-      const matchesDate = !filterDate || (() => {
-        const d = new Date(order.createdAt);
-        const dateString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-        return dateString === filterDate;
-      })();
-      const matchesSearch = !orderSearchTerm || order.customerName.toLowerCase().includes(orderSearchTerm.toLowerCase());
-      return matchesDate && matchesSearch;
+      const matchesDate =
+        !filterDate ||
+        (() => {
+          const d = new Date(order.createdAt);
+          const dateString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+          return dateString === filterDate;
+        })();
+      const matchesSearch =
+        !orderSearchTerm ||
+        order.customerName
+          .toLowerCase()
+          .includes(orderSearchTerm.toLowerCase());
+      const matchesStatus =
+        filterStatus === "Semua" || order.status === filterStatus;
+      return matchesDate && matchesSearch && matchesStatus;
     }) || [];
 
   // --- HANDLERS ---
@@ -282,6 +291,9 @@ export default function AdminDashboard() {
   // --- ORDER ACTIONS ---
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
+      // Ambil data order untuk pesan WhatsApp sebelum update
+      const targetOrder = orders?.find((o) => o._id === orderId);
+
       if (orders) {
         mutateOrders(
           orders.map((o) =>
@@ -297,6 +309,31 @@ export default function AdminDashboard() {
       });
       if (res.ok) {
         mutateOrders();
+
+        // --- AUTO WHATSAPP JIKA COMPLETED ---
+        if (newStatus === "completed" && targetOrder) {
+          // Format nomor HP: 08xx -> 628xx
+          let phone = targetOrder.customerPhone.replace(/\D/g, "");
+          if (phone.startsWith("0")) {
+            phone = "62" + phone.slice(1);
+          }
+
+          const itemsList = (targetOrder.items || [])
+            .map((item) => {
+              const showVariant = !item.name
+                .toLowerCase()
+                .includes(item.variant.toLowerCase());
+              return `- ${item.quantity}x ${item.name}${showVariant ? ` (${item.variant})` : ""}`;
+            })
+            .join("\n");
+
+          const message = `Halo Kak *${targetOrder.customerName}*!\nPesanan Kakak dengan Order ID: *${targetOrder.orderId}*sudah SELESAI.\n\nRincian Pesanan:\n${itemsList}\nTotal: Rp ${targetOrder.totalPrice.toLocaleString("id-ID")}\n\nTerima kasih telah memesan di Ruang Nadi Coffee!`;
+
+          window.open(
+            `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+            "_blank",
+          );
+        }
       }
     } catch (error) {
       console.error("Gagal update status:", error);
@@ -308,14 +345,17 @@ export default function AdminDashboard() {
     const printWindow = window.open("", "", "width=300,height=600");
     if (!printWindow) return;
     const itemsHtml = (order.items || [])
-      .map(
-        (item) => `
+      .map((item) => {
+        const showVariant = !item.name
+          .toLowerCase()
+          .includes(item.variant.toLowerCase());
+        return `
       <div style="display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 4px;">
-        <span style="flex: 1;">${item.quantity}x ${item.name} <br/> <span style="color: #666; font-size: 9px;">(${item.variant})</span></span>
+        <span style="flex: 1;">${item.quantity}x ${item.name} <br/> ${showVariant ? `<span style="color: #666; font-size: 9px;">(${item.variant})</span>` : ""}</span>
         <span style="font-weight: bold;">${(item.price * item.quantity).toLocaleString("id-ID")}</span>
       </div>
-    `,
-      )
+    `;
+      })
       .join("");
     const htmlContent = `
       <html>
@@ -347,7 +387,12 @@ export default function AdminDashboard() {
       Status: order.status.toUpperCase(),
       "Total Bayar": order.totalPrice,
       "Rincian Menu": (order.items || [])
-        .map((i) => `${i.quantity}x ${i.name} (${i.variant})`)
+        .map((i) => {
+          const showVariant = !i.name
+            .toLowerCase()
+            .includes(i.variant.toLowerCase());
+          return `${i.quantity}x ${i.name}${showVariant ? ` (${i.variant})` : ""}`;
+        })
         .join(", "),
     }));
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
@@ -756,42 +801,44 @@ export default function AdminDashboard() {
         {/* ================= TAB 2: MONITORING PESANAN ================= */}
         {activeTab === "ORDERS" && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
-              <div>
-                <h2 className="text-2xl font-bold text-stone-800">
-                  Pesanan Masuk
-                </h2>
-                <p className="text-stone-500 text-sm">
-                  Real-time monitoring. Otomatis refresh tiap 10 detik.
-                </p>
+            <div className="flex flex-col items-center mb-8 gap-6">
+              <div className="text-center">
+                <h2 className="text-2xl font-bold text-stone-800">Orders</h2>
               </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="relative">
+              <div className="w-full flex flex-col md:flex-row items-center justify-center relative gap-4">
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Cari Customer..."
+                      value={orderSearchTerm}
+                      onChange={(e) => setOrderSearchTerm(e.target.value)}
+                      className="pl-9 pr-4 py-2 bg-white border border-stone-200 rounded-xl text-sm outline-none focus:border-amber-600 w-48 transition-all"
+                    />
+                    <span className="absolute left-3 top-2 text-stone-400 text-xs">
+                      🔍
+                    </span>
+                  </div>
+                  {/* Filter Tanggal */}
                   <input
-                    type="text"
-                    placeholder="Cari Customer..."
-                    value={orderSearchTerm}
-                    onChange={(e) => setOrderSearchTerm(e.target.value)}
-                    className="pl-9 pr-4 py-2 bg-white border border-stone-200 rounded-xl text-sm outline-none focus:border-amber-600 w-48 transition-all"
+                    type="date"
+                    value={filterDate}
+                    onChange={(e) => setFilterDate(e.target.value)}
+                    className="px-4 py-2 bg-white border border-stone-200 rounded-xl text-sm font-bold outline-none focus:border-amber-600 text-stone-600"
                   />
-                  <span className="absolute left-3 top-2 text-stone-400 text-xs">🔍</span>
+                  <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-stone-200 text-sm font-bold">
+                    Total: {filteredOrders.length}
+                  </div>
                 </div>
-                {/* Filter Tanggal */}
-                <input
-                  type="date"
-                  value={filterDate}
-                  onChange={(e) => setFilterDate(e.target.value)}
-                  className="px-4 py-2 bg-white border border-stone-200 rounded-xl text-sm font-bold outline-none focus:border-amber-600 text-stone-600"
-                />
+
                 {/* BUTTON DOWNLOAD EXCEL */}
-                <button
-                  onClick={downloadExcel}
-                  className="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-green-200 transition-all border border-green-200"
-                >
-                  📊 Excel
-                </button>
-                <div className="bg-white px-4 py-2 rounded-xl shadow-sm border border-stone-200 text-sm font-bold">
-                  Total: {filteredOrders.length}
+                <div className="md:absolute md:right-0">
+                  <button
+                    onClick={downloadExcel}
+                    className="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-green-200 transition-all border border-green-200"
+                  >
+                    📊 Export
+                  </button>
                 </div>
               </div>
             </div>
@@ -864,7 +911,7 @@ export default function AdminDashboard() {
                         <p className="text-[10px] font-black uppercase text-stone-400 tracking-widest mb-1">
                           Items
                         </p>
-                        <div className="space-y-1">
+                        <div className="space-y-1 max-h-24 overflow-y-auto custom-scrollbar pr-1">
                           {(order.items || []).map((item, idx) => (
                             <p
                               key={idx}
@@ -929,7 +976,19 @@ export default function AdminDashboard() {
                       <th className="p-6">Customer</th>
                       <th className="p-6">Items</th>
                       <th className="p-6">Total</th>
-                      <th className="p-6 text-center">Status</th>
+                      <th className="p-6 text-center">
+                        <select
+                          value={filterStatus}
+                          onChange={(e) => setFilterStatus(e.target.value)}
+                          className="bg-transparent text-xs font-bold uppercase tracking-widest text-stone-500 outline-none cursor-pointer"
+                        >
+                          <option value="Semua">STATUS (ALL)</option>
+                          <option value="pending">PENDING</option>
+                          <option value="success">PROCESS</option>
+                          <option value="completed">COMPLETED</option>
+                          <option value="failed">FAILED</option>
+                        </select>
+                      </th>
                       <th className="p-6 text-center">Print</th>
                     </tr>
                   </thead>
@@ -997,16 +1056,20 @@ export default function AdminDashboard() {
                             </p>
                           </td>
                           <td className="p-6">
-                            <div className="space-y-1">
+                            <div className="space-y-1 max-h-32 overflow-y-auto custom-scrollbar pr-2">
                               {(order.items || []).map((item, idx) => (
                                 <p key={idx} className="text-sm text-stone-600">
                                   <span className="font-bold text-amber-700">
                                     {item.quantity}x
                                   </span>{" "}
                                   {item.name}
-                                  <span className="text-[10px] text-stone-400 ml-1">
-                                    ({item.variant})
-                                  </span>
+                                  {!item.name
+                                    .toLowerCase()
+                                    .includes(item.variant.toLowerCase()) && (
+                                    <span className="text-[10px] text-stone-400 ml-1">
+                                      ({item.variant})
+                                    </span>
+                                  )}
                                 </p>
                               ))}
                             </div>

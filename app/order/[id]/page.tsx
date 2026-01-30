@@ -39,8 +39,14 @@ export default function OrderStatusPage({
 
   if (isLoading)
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#faf9f6] text-stone-400">
-        Memuat Pesanan...
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#faf9f6]">
+        <div className="relative w-20 h-20 flex items-center justify-center mb-6">
+          <div className="absolute inset-0 border-4 border-stone-200 border-t-amber-600 rounded-full animate-spin"></div>
+          <span className="text-3xl animate-pulse">☕</span>
+        </div>
+        <p className="text-stone-400 font-bold text-xs tracking-[0.3em] uppercase animate-pulse">
+          Memuat Status...
+        </p>
       </div>
     );
   if (error || !order || order.error)
@@ -76,13 +82,13 @@ export default function OrderStatusPage({
   }
 
   return (
-    <main className="min-h-screen bg-[#faf9f6] py-10 px-4 flex items-center justify-center font-sans">
-      <div className="w-full max-w-md bg-white p-8 rounded-4xl shadow-xl border border-stone-100 relative overflow-hidden">
+    <main className="min-h-screen bg-[#faf9f6] py-4 px-4 flex items-center justify-center font-sans">
+      <div className="w-full max-w-md bg-white p-6 rounded-3xl shadow-xl border border-stone-100 relative overflow-hidden">
         {/* Hiasan Atas (Struk Sobek) */}
         <div className="absolute top-0 left-0 w-full h-2 bg-amber-600/20"></div>
 
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-stone-400 mb-2">
             RUANG NADI COFFEE
           </p>
@@ -96,7 +102,7 @@ export default function OrderStatusPage({
 
         {/* Status Card */}
         <div
-          className={`flex items-center justify-center gap-3 p-4 rounded-2xl mb-8 ${statusColor} bg-opacity-50`}
+          className={`flex items-center justify-center gap-3 p-3 rounded-2xl mb-4 ${statusColor} bg-opacity-50`}
         >
           <span className="text-2xl animate-bounce">{statusIcon}</span>
           <div className="text-left">
@@ -108,7 +114,7 @@ export default function OrderStatusPage({
         </div>
 
         {/* Detail Pesanan */}
-        <div className="border-t border-dashed border-stone-200 py-6 space-y-4">
+        <div className="border-t border-dashed border-stone-200 py-3 space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-stone-400">Order ID</span>
             <span className="font-mono font-bold text-stone-700">
@@ -131,11 +137,11 @@ export default function OrderStatusPage({
 
         {/* List Items */}
         {/* List Items */}
-        <div className="border-t border-dashed border-stone-200 py-6">
-          <p className="text-[10px] font-black uppercase text-stone-400 tracking-widest mb-4">
+        <div className="border-t border-dashed border-stone-200 py-3">
+          <p className="text-[10px] font-black uppercase text-stone-400 tracking-widest mb-2">
             Rincian Menu
           </p>
-          <div className="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+          <div className="space-y-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar">
             {/* PERBAIKAN: Tambahkan '?' setelah items dan fallback '|| []' */}
             {(order.items || []).map((item: any, idx: number) => (
               <div
@@ -148,9 +154,13 @@ export default function OrderStatusPage({
                   </span>
                   <div>
                     <p className="text-stone-800 font-bold">{item.name}</p>
-                    <p className="text-xs text-stone-400 italic">
-                      Varian: {item.variant}
-                    </p>
+                    {!item.name
+                      .toLowerCase()
+                      .includes(item.variant.toLowerCase()) && (
+                      <p className="text-xs text-stone-400 italic">
+                        Varian: {item.variant}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <span className="font-bold text-stone-600">
@@ -169,22 +179,22 @@ export default function OrderStatusPage({
         </div>
 
         {/* Total */}
-        <div className="border-t-2 border-stone-100 pt-6 pb-2">
+        <div className="border-t-2 border-stone-100 pt-4 pb-2">
           <div className="flex justify-between items-center">
             <span className="font-bold text-lg text-stone-800">
               Total Bayar
             </span>
-            <span className="font-black text-2xl text-amber-700">
+            <span className="font-black text-xl text-amber-700">
               Rp {(order.totalPrice || 0).toLocaleString("id-ID")}
             </span>
           </div>
         </div>
 
         {/* Footer Buttons */}
-        <div className="mt-8 space-y-3">
+        <div className="mt-4 space-y-2">
           <Link
             href="/"
-            className="block w-full py-4 bg-stone-800 text-white text-center rounded-xl font-bold text-sm hover:bg-stone-900 transition-all"
+            className="block w-full py-3 bg-stone-800 text-white text-center rounded-xl font-bold text-sm hover:bg-stone-900 transition-all"
           >
             ← Kembali ke website
           </Link>

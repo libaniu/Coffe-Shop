@@ -135,7 +135,7 @@ export default function OrderStatusPage({
           <p className="text-[10px] font-black uppercase text-stone-400 tracking-widest mb-4">
             Rincian Menu
           </p>
-          <div className="space-y-3">
+          <div className="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
             {/* PERBAIKAN: Tambahkan '?' setelah items dan fallback '|| []' */}
             {(order.items || []).map((item: any, idx: number) => (
               <div

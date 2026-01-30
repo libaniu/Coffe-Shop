@@ -73,6 +73,7 @@ export default function AdminDashboard() {
   });
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [searchTerm, setSearchTerm] = useState("");
+  const [orderSearchTerm, setOrderSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("");
   const categories = ["Semua", "Coffee", "Non-Coffee", "Pastry", "Food"];
 
@@ -124,10 +125,13 @@ export default function AdminDashboard() {
   // --- FILTER ORDERS ---
   const filteredOrders =
     orders?.filter((order) => {
-      if (!filterDate) return true;
-      const d = new Date(order.createdAt);
-      const dateString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-      return dateString === filterDate;
+      const matchesDate = !filterDate || (() => {
+        const d = new Date(order.createdAt);
+        const dateString = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        return dateString === filterDate;
+      })();
+      const matchesSearch = !orderSearchTerm || order.customerName.toLowerCase().includes(orderSearchTerm.toLowerCase());
+      return matchesDate && matchesSearch;
     }) || [];
 
   // --- HANDLERS ---
@@ -752,7 +756,7 @@ export default function AdminDashboard() {
         {/* ================= TAB 2: MONITORING PESANAN ================= */}
         {activeTab === "ORDERS" && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-end mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
               <div>
                 <h2 className="text-2xl font-bold text-stone-800">
                   Pesanan Masuk
@@ -761,7 +765,17 @@ export default function AdminDashboard() {
                   Real-time monitoring. Otomatis refresh tiap 10 detik.
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Cari Customer..."
+                    value={orderSearchTerm}
+                    onChange={(e) => setOrderSearchTerm(e.target.value)}
+                    className="pl-9 pr-4 py-2 bg-white border border-stone-200 rounded-xl text-sm outline-none focus:border-amber-600 w-48 transition-all"
+                  />
+                  <span className="absolute left-3 top-2 text-stone-400 text-xs">🔍</span>
+                </div>
                 {/* Filter Tanggal */}
                 <input
                   type="date"

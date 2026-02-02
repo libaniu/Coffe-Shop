@@ -160,14 +160,14 @@ export default function Home() {
     <main className="min-h-screen bg-[#faf9f6] relative">
       {/* Toast Notification */}
       <div
-        className={`fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-9999 transition-all duration-300 ${
+        className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 z-[100] transition-all duration-300 ${
           toast.show
-            ? "opacity-100 scale-100"
-            : "opacity-0 scale-90 pointer-events-none"
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-8 pointer-events-none"
         }`}
       >
         <div
-          className={`flex items-center gap-3 px-8 py-6 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] border-2 ${
+          className={`flex items-center gap-3 px-6 py-4 rounded-2xl shadow-2xl border ${
             toast.type === "success"
               ? "bg-white border-emerald-500 text-emerald-800"
               : toast.type === "warning"
@@ -302,7 +302,7 @@ export default function Home() {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
@@ -317,7 +317,7 @@ export default function Home() {
         ) : (
           <>
             {/* GRID MENU - MENGGUNAKAN currentItems (Data yang sudah dipotong) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 min-h-125">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 min-h-125">
               {currentItems.length > 0 ? (
                 currentItems.map((item: any) => (
                   <MenuCard
@@ -327,8 +327,9 @@ export default function Home() {
                   />
                 ))
               ) : (
-                <div className="col-span-3 text-center py-20">
-                  <p className="text-stone-400 italic text-lg">
+                <div className="col-span-full text-center py-20 flex flex-col items-center opacity-60">
+                  <span className="text-4xl mb-2">🔍</span>
+                  <p className="text-stone-500 italic text-lg">
                     Menu tidak ditemukan.
                   </p>
                 </div>
@@ -418,6 +419,19 @@ export default function Home() {
         }
         onClearCart={clearCart}
       />
+
+      {/* Floating Cart Button (Mobile Only) */}
+      {cart.length > 0 && (
+        <button
+          onClick={() => setIsCartOpen(true)}
+          className="md:hidden fixed bottom-6 right-6 bg-[#2d241e] text-white w-14 h-14 rounded-full shadow-xl z-40 flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
+        >
+          <span className="text-xl">🛍️</span>
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-[#faf9f6]">
+            {cart.reduce((acc, item) => acc + item.qty, 0)}
+          </span>
+        </button>
+      )}
     </main>
   );
 }

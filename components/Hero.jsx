@@ -5,7 +5,6 @@ import Image from "next/image";
 const Hero = () => {
   return (
     <header className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-[#2d241e]">
-      
       {/* 1. LAYER DASAR: Gambar Background */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -14,7 +13,7 @@ const Hero = () => {
           fill
           className="object-cover object-center scale-105"
         />
-        
+
         {/* 2. LAYER OVERLAY: Cinematic Gradient (V4 Syntax) */}
         {/* 'from-black/80' untuk pastikan teks putih kamu tajam di atas */}
         {/* 'to-[#2d241e]' agar menyatu dengan background dasar */}
@@ -41,11 +40,15 @@ const Hero = () => {
         </p>
 
         <div className="mt-12">
-          <button 
-            onClick={() => document.getElementById('menu-section')?.scrollIntoView({ behavior: 'smooth' })}
+          <button
+            onClick={() =>
+              document
+                .getElementById("menu")
+                ?.scrollIntoView({ behavior: "smooth" })
+            }
             className="bg-amber-600 hover:bg-amber-700 text-white px-10 py-4 rounded-full font-bold transition-all transform hover:scale-105 active:scale-95 shadow-2xl cursor-pointer"
           >
-            Eksplor Menu
+            Explore Menu
           </button>
         </div>
       </div>

@@ -160,7 +160,7 @@ export default function Home() {
     <main className="min-h-screen bg-[#faf9f6] relative">
       {/* Toast Notification */}
       <div
-        className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 z-[100] transition-all duration-300 ${
+        className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 z-100 transition-all duration-300 ${
           toast.show
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-8 pointer-events-none"

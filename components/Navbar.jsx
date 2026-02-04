@@ -29,13 +29,14 @@ const Navbar = ({ totalItems, onOpenCart }) => {
     >
       <div className="flex justify-between items-center px-6 md:px-8 max-w-7xl mx-auto">
         {/* Logo - Berubah warna saat scroll */}
-        <div
-          className={`text-2xl font-serif font-bold tracking-tighter transition-colors duration-300 ${
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className={`text-2xl font-serif font-bold tracking-tighter transition-colors duration-300 cursor-pointer ${
             isScrolled ? "text-white" : "text-white"
           }`}
         >
           RUANG<span className="text-amber-800">NADI</span>
-        </div>
+        </button>
 
         {/* Desktop Menu Links - Putih saat di Hero, tetap putih saat scroll (karena bg cokelat) */}
         <div className="hidden md:flex gap-8 font-medium text-xs uppercase tracking-[0.2em] text-white/90">

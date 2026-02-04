@@ -146,14 +146,16 @@ export default function OrderStatusPage({
             {(order.items || []).map((item: any, idx: number) => (
               <div
                 key={idx}
-                className="flex justify-between items-start text-sm"
+                className="flex justify-between items-start text-sm gap-4"
               >
-                <div className="flex gap-3">
-                  <span className="font-bold text-amber-700 bg-amber-50 px-2 rounded-md h-fit">
+                <div className="flex gap-3 flex-1">
+                  <span className="font-bold text-amber-700 bg-amber-50 px-2 rounded-md h-fit shrink-0">
                     {item.quantity}x
                   </span>
-                  <div>
-                    <p className="text-stone-800 font-bold">{item.name}</p>
+                  <div className="min-w-0">
+                    <p className="text-stone-800 font-bold leading-tight">
+                      {item.name}
+                    </p>
                     {!item.name
                       .toLowerCase()
                       .includes(item.variant.toLowerCase()) && (
@@ -163,7 +165,7 @@ export default function OrderStatusPage({
                     )}
                   </div>
                 </div>
-                <span className="font-bold text-stone-600">
+                <span className="font-bold text-stone-600 shrink-0 whitespace-nowrap">
                   Rp {(item.price * item.quantity).toLocaleString("id-ID")}
                 </span>
               </div>

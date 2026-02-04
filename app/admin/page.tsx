@@ -67,6 +67,7 @@ export default function AdminDashboard() {
   // --- UI STATES ---
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("Berhasil Disimpan!");
   const [bulkModal, setBulkModal] = useState({
     show: false,
     targetStatus: true,
@@ -76,6 +77,7 @@ export default function AdminDashboard() {
   const [orderSearchTerm, setOrderSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("");
   const [filterStatus, setFilterStatus] = useState("Semua");
+  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
   const categories = ["Semua", "Coffee", "Non-Coffee", "Pastry", "Food"];
 
   // Modals
@@ -219,6 +221,7 @@ export default function AdminDashboard() {
       body: JSON.stringify(newMenu),
     });
     if (res.ok) {
+      setSuccessMessage("Berhasil Disimpan!");
       setShowSuccessModal(true);
       setNewMenu({
         name: "",
@@ -243,6 +246,7 @@ export default function AdminDashboard() {
     });
     if (res.ok) {
       setIsEditModalOpen(false);
+      setSuccessMessage("Berhasil Disimpan!");
       setShowSuccessModal(true);
       fetchMenu();
       fetchLogs();
@@ -269,6 +273,8 @@ export default function AdminDashboard() {
     });
     if (res.ok) {
       setDeleteModal({ show: false, id: "", name: "" });
+      setSuccessMessage("Berhasil Dihapus!");
+      setShowSuccessModal(true);
       fetchMenu();
       fetchLogs();
     }
@@ -282,6 +288,7 @@ export default function AdminDashboard() {
     });
     if (res.ok) {
       setBulkModal({ ...bulkModal, show: false });
+      setSuccessMessage("Status Berhasil Diubah!");
       setShowSuccessModal(true);
       fetchMenu();
       fetchLogs();
@@ -414,12 +421,48 @@ export default function AdminDashboard() {
     );
   };
 
+  const handleSort = (key: string) => {
+    let direction: "asc" | "desc" = "asc";
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
   // Filter Menu
-  const filteredMenu = menuList.filter(
-    (item) =>
-      (selectedCategory === "Semua" || item.category === selectedCategory) &&
-      item.name.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+  const filteredMenu = menuList
+    .filter(
+      (item) =>
+        (selectedCategory === "Semua" || item.category === selectedCategory) &&
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    )
+    .sort((a, b) => {
+      if (!sortConfig) return 0;
+      const { key, direction } = sortConfig;
+
+      let valA: any;
+      let valB: any;
+
+      if (key === "price") {
+        valA = a.variants?.[0]?.price || 0;
+        valB = b.variants?.[0]?.price || 0;
+      } else if (key === "isAvailable") {
+        valA = a.isAvailable !== false;
+        valB = b.isAvailable !== false;
+      } else {
+        valA = a[key as keyof IMenu];
+        valB = b[key as keyof IMenu];
+      }
+
+      if (typeof valA === "string" && typeof valB === "string") {
+        valA = valA.toLowerCase();
+        valB = valB.toLowerCase();
+      }
+
+      if (valA < valB) return direction === "asc" ? -1 : 1;
+      if (valA > valB) return direction === "asc" ? 1 : -1;
+      return 0;
+    });
 
   return (
     <div className="min-h-screen bg-stone-50 p-4 md:p-10 font-sans text-[#2d241e]">
@@ -620,13 +663,41 @@ export default function AdminDashboard() {
             {/* Table Menu (Desktop) */}
             <div className="bg-white rounded-[2.5rem] shadow-sm border border-stone-200 overflow-hidden hidden md:block">
               <table className="w-full text-left">
-                <thead className="bg-stone-50 border-b border-stone-100 text-[10px] uppercase font-bold text-stone-500 tracking-widest">
+                <thead className="bg-stone-100 border-b border-stone-100 text-[10px] uppercase font-bold text-stone-600 tracking-widest">
                   <tr>
-                    <th className="px-8 py-6">Menu</th>
-                    <th className="px-6 py-6">Kategori</th>
-                    <th className="px-6 py-6">Harga Dasar</th>
-                    <th className="px-6 py-6">Status</th>
-                    <th className="px-6 py-6 text-right">Aksi</th>
+                    <th
+                      className="px-8 py-6 cursor-pointer hover:text-stone-700 transition-colors select-none"
+                      onClick={() => handleSort("name")}
+                    >
+                      Menu{" "}
+                      {sortConfig?.key === "name" &&
+                        (sortConfig.direction === "asc" ? "↑" : "↓")}
+                    </th>
+                    <th
+                      className="px-6 py-6 cursor-pointer hover:text-stone-700 transition-colors select-none"
+                      onClick={() => handleSort("category")}
+                    >
+                      Kategori{" "}
+                      {sortConfig?.key === "category" &&
+                        (sortConfig.direction === "asc" ? "↑" : "↓")}
+                    </th>
+                    <th
+                      className="px-6 py-6 cursor-pointer hover:text-stone-700 transition-colors select-none"
+                      onClick={() => handleSort("price")}
+                    >
+                      Harga {" "}
+                      {sortConfig?.key === "price" &&
+                        (sortConfig.direction === "asc" ? "↑" : "↓")}
+                    </th>
+                    <th
+                      className="px-6 py-6 cursor-pointer hover:text-stone-700 transition-colors select-none"
+                      onClick={() => handleSort("isAvailable")}
+                    >
+                      Status{" "}
+                      {sortConfig?.key === "isAvailable" &&
+                        (sortConfig.direction === "asc" ? "↑" : "↓")}
+                    </th>
+                    <th className="px-6 py-6 text-left">Aksi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-50">
@@ -649,7 +720,7 @@ export default function AdminDashboard() {
                             <div className="h-6 w-16 bg-stone-200 rounded-full"></div>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="h-8 w-20 bg-stone-200 rounded ml-auto"></div>
+                            <div className="h-8 w-20 bg-stone-200 rounded"></div>
                           </td>
                         </tr>
                       ))
@@ -681,7 +752,7 @@ export default function AdminDashboard() {
                               {item.isAvailable ? "Ready" : "Sold Out"}
                             </button>
                           </td>
-                          <td className="px-6 py-4 text-right space-x-2">
+                          <td className="px-6 py-4 text-left space-x-2">
                             <button
                               onClick={() => {
                                 setEditingData({ ...item });
@@ -1296,7 +1367,7 @@ export default function AdminDashboard() {
                 ✓
               </div>
               <h3 className="text-lg font-bold text-stone-800 mb-6">
-                Berhasil Disimpan!
+                {successMessage}
               </h3>
               <button
                 onClick={() => setShowSuccessModal(false)}

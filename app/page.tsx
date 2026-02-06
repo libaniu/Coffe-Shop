@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import useSWR from "swr";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
@@ -13,6 +13,22 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Home() {
   const [cart, setCart] = useState<any[]>([]);
+  const [isCartInitialized, setIsCartInitialized] = useState(false);
+
+  useEffect(() => {
+    const savedCart = localStorage.getItem("ruang-nadi-cart");
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
+    setIsCartInitialized(true);
+  }, []);
+
+  useEffect(() => {
+    if (isCartInitialized) {
+      localStorage.setItem("ruang-nadi-cart", JSON.stringify(cart));
+    }
+  }, [cart, isCartInitialized]);
+
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,19 +39,17 @@ export default function Home() {
 
   // --- PAGINATION STATE ---
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9; // Tampilkan 9 menu per halaman
+  const itemsPerPage = 9;
 
   // 👇 --- FIX: LOGIC AGAR TIDAK SCROLL SAAT REFRESH ---
-  const isFirstRender = useRef(true); // Penanda apakah ini render pertama
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    // Cek: Jika ini adalah render pertama (baru buka/refresh), hentikan di sini.
     if (isFirstRender.current) {
-      isFirstRender.current = false; // Set jadi false agar klik berikutnya (halaman 2 dst) bisa jalan
+      isFirstRender.current = false;
       return;
     }
 
-    // Kode di bawah ini hanya jalan kalau user KLIK tombol pagination
     if (typeof window !== "undefined") {
       const menuSection = document.getElementById("menu");
       if (menuSection) {
@@ -77,7 +91,6 @@ export default function Home() {
   }, []);
 
   // --- RESET HALAMAN JIKA FILTER BERUBAH ---
-  // Kalau user ganti kategori atau cari menu, kembalikan ke halaman 1
   useEffect(() => {
     setCurrentPage(1);
   }, [activeCategory, searchQuery, sortBy]);
@@ -95,25 +108,27 @@ export default function Home() {
   const safeMenuList = Array.isArray(menuList) ? menuList : [];
 
   // 1. FILTER & SORT DATA DULU
-  const filteredAndSortedMenu = safeMenuList
-    .filter((item: any) => {
-      const matchesCategory =
-        activeCategory === "All" || item.category === activeCategory;
-      const matchesSearch = item.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
-    })
-    .sort((a: any, b: any) => {
-      const priceA = a.variants?.[0]?.price || 0;
-      const priceB = b.variants?.[0]?.price || 0;
+  const filteredAndSortedMenu = useMemo(() => {
+    return safeMenuList
+      .filter((item: any) => {
+        const matchesCategory =
+          activeCategory === "All" || item.category === activeCategory;
+        const matchesSearch = item.name
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase());
+        return matchesCategory && matchesSearch;
+      })
+      .sort((a: any, b: any) => {
+        const priceA = a.variants?.[0]?.price || 0;
+        const priceB = b.variants?.[0]?.price || 0;
 
-      if (sortBy === "name-asc") return a.name.localeCompare(b.name);
-      if (sortBy === "name-desc") return b.name.localeCompare(a.name);
-      if (sortBy === "price-low") return priceA - priceB;
-      if (sortBy === "price-high") return priceB - priceA;
-      return 0;
-    });
+        if (sortBy === "name-asc") return a.name.localeCompare(b.name);
+        if (sortBy === "name-desc") return b.name.localeCompare(a.name);
+        if (sortBy === "price-low") return priceA - priceB;
+        if (sortBy === "price-high") return priceB - priceA;
+        return 0;
+      });
+  }, [safeMenuList, activeCategory, searchQuery, sortBy]);
 
   // --- PAGINATION LOGIC ---
   // 2. HITUNG INDEKS DATA UNTUK HALAMAN SAAT INI
@@ -339,7 +354,6 @@ export default function Home() {
             {/* --- BUTTON PAGINATION (UI) --- */}
             {totalPages > 1 && (
               <div className="flex justify-center items-center gap-2 mt-16">
-                {/* Tombol PREV */}
                 <button
                   onClick={() =>
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
@@ -350,7 +364,6 @@ export default function Home() {
                   ←
                 </button>
 
-                {/* Tombol Angka Halaman */}
                 {[...Array(totalPages)].map((_, idx) => {
                   const pageNum = idx + 1;
                   return (
@@ -370,7 +383,6 @@ export default function Home() {
                   );
                 })}
 
-                {/* Tombol NEXT */}
                 <button
                   onClick={() =>
                     setCurrentPage((prev) => Math.min(prev + 1, totalPages))
@@ -383,7 +395,6 @@ export default function Home() {
               </div>
             )}
 
-            {/* Indikator Halaman (Opsional) */}
             {filteredAndSortedMenu.length > 0 && (
               <p className="text-center text-xs text-stone-400 mt-4">
                 Menampilkan {indexOfFirstItem + 1} -{" "}

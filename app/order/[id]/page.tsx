@@ -158,7 +158,7 @@ export default function OrderStatusPage({
                     </p>
                     {!item.name
                       .toLowerCase()
-                      .includes(item.variant.toLowerCase()) && (
+                      .includes((item.variant || "").toLowerCase()) && (
                       <p className="text-xs text-stone-400 italic">
                         Varian: {item.variant}
                       </p>

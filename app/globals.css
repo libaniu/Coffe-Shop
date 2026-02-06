@@ -12,7 +12,7 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', sans-serif; /* Pastikan font sudah terinstall atau gunakan font standar */
+  font-family: "Inter", sans-serif;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -24,8 +24,12 @@ body {
 }
 
 @keyframes cartSlideIn {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .cart-slide-in {
@@ -33,8 +37,14 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fadeIn {

@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://ruang-nadi-web.vercel.app'; // Ganti dengan domain Vercel kamu
+  const baseUrl = 'https://ruang-nadi-web.vercel.app';
 
   return [
     {
@@ -11,11 +11,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${baseUrl}/menu`, // Halaman Menu (kalau ada url khususnya)
+      url: `${baseUrl}/menu`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
-    // Tambahkan halaman lain jika perlu
   ];
 }

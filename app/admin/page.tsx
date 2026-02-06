@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import * as XLSX from "xlsx"; // Pastikan sudah install: npm install xlsx
+import * as XLSX from "xlsx";
 
 // --- INTERFACES ---
 interface IVariant {
@@ -55,7 +55,6 @@ export default function AdminDashboard() {
   const [logs, setLogs] = useState<ILog[]>([]);
   const [isLoadingMenu, setIsLoadingMenu] = useState(true);
 
-  // Data Orders (Auto Refresh via SWR)
   const {
     data: orders,
     mutate: mutateOrders,
@@ -298,7 +297,6 @@ export default function AdminDashboard() {
   // --- ORDER ACTIONS ---
   const updateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      // Ambil data order untuk pesan WhatsApp sebelum update
       const targetOrder = orders?.find((o) => o._id === orderId);
 
       if (orders) {
@@ -319,7 +317,6 @@ export default function AdminDashboard() {
 
         // --- AUTO WHATSAPP JIKA COMPLETED ---
         if (newStatus === "completed" && targetOrder) {
-          // Format nomor HP: 08xx -> 628xx
           let phone = targetOrder.customerPhone.replace(/\D/g, "");
           if (phone.startsWith("0")) {
             phone = "62" + phone.slice(1);
@@ -792,16 +789,13 @@ export default function AdminDashboard() {
                       className="bg-white p-5 rounded-3xl shadow-sm border border-stone-200 animate-pulse"
                     >
                       <div className="flex gap-4">
-                        {/* Skeleton Gambar */}
                         <div className="w-20 h-20 bg-stone-200 rounded-2xl shrink-0"></div>
-                        {/* Skeleton Teks */}
                         <div className="flex-1 space-y-2 py-1">
                           <div className="h-4 bg-stone-200 rounded w-3/4"></div>
                           <div className="h-3 bg-stone-200 rounded w-1/2"></div>
                           <div className="h-4 bg-stone-200 rounded w-1/3 mt-2"></div>
                         </div>
                       </div>
-                      {/* Skeleton Tombol Bawah */}
                       <div className="flex gap-2 mt-4 pt-4 border-t border-stone-100">
                         <div className="h-8 flex-1 bg-stone-200 rounded-xl"></div>
                         <div className="h-8 w-16 bg-stone-200 rounded-xl"></div>
@@ -890,7 +884,6 @@ export default function AdminDashboard() {
                       🔍
                     </span>
                   </div>
-                  {/* Filter Tanggal */}
                   <input
                     type="date"
                     value={filterDate}
@@ -916,7 +909,6 @@ export default function AdminDashboard() {
 
             {/* MOBILE VIEW ORDERS */}
             <div className="md:hidden space-y-4">
-              {/* SKELETON LOADING MOBILE */}
               {isLoadingOrders ? (
                 [...Array(3)].map((_, i) => (
                   <div
@@ -1290,7 +1282,6 @@ export default function AdminDashboard() {
               {/* BAGIAN KANAN: PREVIEW GAMBAR & TOMBOL (SUDAH DIPERBAIKI UNTUK MOBILE) */}
               <div className="bg-stone-50 w-full md:w-80 p-6 md:p-8 flex flex-col justify-between border-l border-stone-100">
                 <div>
-                  {/* Perbaikan: w-40 h-40 di mobile agar tidak full screen & rata tengah */}
                   <div className="w-40 h-40 md:w-full md:h-auto md:aspect-square mx-auto rounded-3xl md:rounded-4xl bg-white overflow-hidden mb-6 md:mb-4 relative group border-4 border-white shadow-sm">
                     {editImagePreview ? (
                       <img

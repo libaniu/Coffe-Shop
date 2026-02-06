@@ -5,7 +5,6 @@ const Navbar = ({ totalItems, onOpenCart }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Fungsi untuk memantau posisi scroll
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -28,7 +27,6 @@ const Navbar = ({ totalItems, onOpenCart }) => {
       }`}
     >
       <div className="flex justify-between items-center px-6 md:px-8 max-w-7xl mx-auto">
-        {/* Logo - Berubah warna saat scroll */}
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           className={`text-2xl font-serif font-bold tracking-tighter transition-colors duration-300 cursor-pointer ${
@@ -38,7 +36,6 @@ const Navbar = ({ totalItems, onOpenCart }) => {
           RUANG<span className="text-amber-800">NADI</span>
         </button>
 
-        {/* Desktop Menu Links - Putih saat di Hero, tetap putih saat scroll (karena bg cokelat) */}
         <div className="hidden md:flex gap-8 font-medium text-xs uppercase tracking-[0.2em] text-white/90">
           <a href="#menu" className="hover:text-amber-500 transition-colors">
             Menu
@@ -73,7 +70,6 @@ const Navbar = ({ totalItems, onOpenCart }) => {
             </span>
           </button>
 
-          {/* Hamburger Icon */}
           <button className="md:hidden p-2" onClick={() => setIsOpen(!isOpen)}>
             <svg
               xmlns="http://www.w3.org/2000/svg"

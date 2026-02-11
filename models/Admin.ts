@@ -11,7 +11,12 @@ const AdminSchema = new Schema({
     type: String, 
     required: true 
   },
-}, { timestamps: true });
+}, { 
+  timestamps: true,
+  collection: 'admins' // <--- TAMBAHKAN INI BIAR TIDAK NYASAR
+});
 
+// Cek apakah model sudah ada (untuk mencegah error overwrite saat hot-reload)
 const Admin = models.Admin || model("Admin", AdminSchema);
+
 export default Admin;

@@ -1,20 +1,33 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Admin from "@/models/Admin";
+import mongoose from "mongoose";
 
 export async function POST(request: Request) {
   try {
     const { username, password } = await request.json();
     await connectDB();
 
-    // 1. Mencari admin berdasarkan username
-    const admin = await Admin.findOne({ username });
+    console.log(
+      "LOG POSISI: Sedang berada di database bernama ->",
+      mongoose.connection.db?.databaseName,
+    );
+
+    // DEBUG: Cek apakah koneksi ke database mana
+    console.log("Mencoba login untuk:", username);
+
+    const admin = await Admin.findOne({ username: username?.trim() }); // Gunakan trim() untuk jaga-jaga ada spasi
 
     if (!admin) {
-      return NextResponse.json({ message: "Username tidak terdaftar" }, { status: 401 });
+      console.log("HASIL: User tidak ditemukan di database.");
+      return NextResponse.json(
+        { message: "Username tidak terdaftar" },
+        { status: 401 },
+      );
     }
 
-    // 2. Validasi password
+    console.log("HASIL: User ditemukan. Membandingkan password...");
+
     if (admin.password !== password) {
       return NextResponse.json({ message: "Password salah" }, { status: 401 });
     }
@@ -23,7 +36,7 @@ export async function POST(request: Request) {
     // Kita buat respon sukses terlebih dahulu
     const response = NextResponse.json(
       { message: "Login Berhasil, Mengalihkan..." },
-      { status: 200 }
+      { status: 200 },
     );
 
     // Memasang cookie 'admin_session' agar browser "mengingat" admin
@@ -38,6 +51,9 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     console.error("Auth Error:", error);
-    return NextResponse.json({ message: "Terjadi kesalahan server" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Terjadi kesalahan server" },
+      { status: 500 },
+    );
   }
 }

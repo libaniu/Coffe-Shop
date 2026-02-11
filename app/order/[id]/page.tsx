@@ -198,7 +198,7 @@ export default function OrderStatusPage({
             href="/"
             className="block w-full py-3 bg-stone-800 text-white text-center rounded-xl font-bold text-sm hover:bg-stone-900 transition-all"
           >
-            ← Kembali ke website
+            ← Ruang Nadi
           </Link>
           <div className="text-center">
             <p className="text-[10px] text-stone-400">

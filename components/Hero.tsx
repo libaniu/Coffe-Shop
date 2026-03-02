@@ -54,7 +54,7 @@ const Hero = () => {
       </div>
 
       {/* 4. LAYER TRANSISI: Halus ke section bawah */}
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-linear-to-t from-[#faf9f6] dark:from-slate-950 to-transparent z-20" />
+      <div className="absolute bottom-0 left-0 w-full h-32 bg-linear-to-t from-[#faf9f6] to-transparent z-20" />
     </header>
   );
 };

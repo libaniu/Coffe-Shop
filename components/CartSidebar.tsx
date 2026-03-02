@@ -1,8 +1,35 @@
 "use client";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation"; // 1. Import Router
+import { useRouter } from "next/navigation";
 
-const CartSidebar = ({
+interface CartItem {
+  _id: string;
+  cartItemId: string;
+  name: string;
+  price: number;
+  qty: number;
+  selectedVariant: string;
+  img: string;
+}
+
+interface CartSidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+  cartItems: CartItem[];
+  onAdd: (item: any, variant: { label: string; price: number }) => void;
+  onSubtract: (cartItemId: string) => void;
+  onRemove: (cartItemId: string) => void;
+  onClearCart: () => void;
+  onShowToast: (message: string, type: string) => void;
+}
+
+declare global {
+  interface Window {
+    snap: any;
+  }
+}
+
+const CartSidebar: React.FC<CartSidebarProps> = ({
   isOpen,
   onClose,
   cartItems,
@@ -12,13 +39,13 @@ const CartSidebar = ({
   onClearCart,
   onShowToast,
 }) => {
-  const router = useRouter(); // 2. Inisialisasi Router
+  const router = useRouter();
   const [customer, setCustomer] = useState({ name: "", phone: "" });
   const [isLoading, setIsLoading] = useState(false);
 
   const totalPrice = cartItems.reduce(
     (acc, item) => acc + item.price * item.qty,
-    0
+    0,
   );
 
   const handleCheckout = async () => {
@@ -56,31 +83,33 @@ const CartSidebar = ({
       // 2. Munculkan Popup Midtrans
       if (data.token) {
         window.snap.pay(data.token, {
-          onSuccess: (result) => {
+          onSuccess: (result: any) => {
             console.log("Success:", result);
-            
+
             // Notifikasi Sukses
-            if (onShowToast) onShowToast("Pembayaran Berhasil! Mengalihkan...", "success");
-            
+            if (onShowToast)
+              onShowToast("Pembayaran Berhasil! Mengalihkan...", "success");
+
             // Bersihkan Keranjang & Tutup Sidebar
-            if (onClearCart) onClearCart(); 
+            if (onClearCart) onClearCart();
             onClose();
 
             // 3. REDIRECT KE HALAMAN TRACKING (Fitur Baru)
             // Menggunakan order_id dari result Midtrans
             router.push(`/order/${result.order_id}`);
           },
-          onPending: (result) => {
+          onPending: (result: any) => {
             console.log("Pending:", result);
             if (onShowToast) onShowToast("Menunggu Pembayaran...", "warning");
           },
-          onError: (result) => {
+          onError: (result: any) => {
             console.error("Error:", result);
             if (onShowToast) onShowToast("Pembayaran Gagal.", "error");
           },
           onClose: () => {
-            if (onShowToast) onShowToast("Pembayaran belum selesai.", "warning");
-          }
+            if (onShowToast)
+              onShowToast("Pembayaran belum selesai.", "warning");
+          },
         });
       }
     } catch (error) {
@@ -103,7 +132,6 @@ const CartSidebar = ({
 
       {/* Sidebar Container */}
       <div className="relative w-full max-w-md bg-[#faf9f6] h-full shadow-[0_0_50px_rgba(0,0,0,0.3)] flex flex-col cart-slide-in border-l border-stone-200">
-        
         {/* Header */}
         <div className="p-8 border-b border-stone-200/60 flex justify-between items-end">
           <div>
@@ -114,7 +142,7 @@ const CartSidebar = ({
               Pesanan Kamu
             </h2>
           </div>
-          
+
           <div className="flex gap-4 items-center">
             {/* Tombol Close (X) */}
             <button
@@ -139,7 +167,10 @@ const CartSidebar = ({
             <div className="space-y-8">
               <div className="space-y-6">
                 {cartItems.map((item) => (
-                  <div key={item.cartItemId} className="flex gap-5 group animate-fadeIn">
+                  <div
+                    key={item.cartItemId}
+                    className="flex gap-5 group animate-fadeIn"
+                  >
                     {/* Gambar Produk */}
                     <div className="relative w-20 h-20 rounded-2xl overflow-hidden shadow-sm border border-stone-200">
                       <img
@@ -167,7 +198,9 @@ const CartSidebar = ({
                           onClick={() => onRemove(item.cartItemId)}
                           className="text-stone-300 hover:text-red-500 transition-colors p-1"
                         >
-                          <span className="text-[10px] font-bold uppercase">Hapus</span>
+                          <span className="text-[10px] font-bold uppercase">
+                            Hapus
+                          </span>
                         </button>
                       </div>
 
@@ -187,7 +220,12 @@ const CartSidebar = ({
                             {item.qty}
                           </span>
                           <button
-                            onClick={() => onAdd(item, { label: item.selectedVariant, price: item.price })}
+                            onClick={() =>
+                              onAdd(item, {
+                                label: item.selectedVariant,
+                                price: item.price,
+                              })
+                            }
                             className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white transition-all text-[#2d241e]"
                           >
                             +

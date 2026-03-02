@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import Order from "../../../models/Order"; // Menggunakan jalur manual yang terbukti berhasil
+import Order from "../../../models/Order";
 
 export async function GET() {
   try {
@@ -11,7 +11,7 @@ export async function GET() {
     const orders = await Order.find({}).sort({ createdAt: -1 });
 
     return NextResponse.json(orders);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Fetch Orders Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

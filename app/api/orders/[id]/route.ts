@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import Order from "@/models/Order"; // Pastikan path import ini benar
+import Order from "@/models/Order";
 
-export async function PUT(request, { params }) {
+interface RouteParams {
+  params: Promise<{ id: string }>;
+}
+
+export async function PUT(request: Request, { params }: RouteParams) {
   try {
     // PERBAIKAN: Await params untuk Next.js 15
     const { id } = await params;
@@ -19,7 +23,7 @@ export async function PUT(request, { params }) {
     const updatedOrder = await Order.findByIdAndUpdate(
       id,
       { status: status },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedOrder) {
@@ -29,13 +33,13 @@ export async function PUT(request, { params }) {
 
     console.log("✅ Berhasil Update!");
     return NextResponse.json(updatedOrder);
-  } catch (error) {
+  } catch (error: any) {
     console.error("🔥 Error Update Order:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(request: Request, { params }: RouteParams) {
   try {
     // PERBAIKAN: Await params juga disini
     const { id } = await params;
@@ -50,7 +54,7 @@ export async function DELETE(request, { params }) {
     }
 
     return NextResponse.json({ message: "Order deleted" });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

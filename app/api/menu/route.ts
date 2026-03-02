@@ -1,41 +1,44 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Menu from "@/models/Menu";
-import Log from "@/models/Log"; 
+import Log from "@/models/Log";
 
 export async function GET() {
   try {
     await connectDB();
     // Mengambil data dan memastikan hasilnya adalah array
-    const menus = await Menu.find({}).lean(); 
+    const menus = await Menu.find({}).lean();
     return NextResponse.json(menus || [], { status: 200 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Database GET Error:", error.message);
-    return NextResponse.json({ message: "Gagal ambil data", error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: "Gagal ambil data", error: error.message },
+      { status: 500 },
+    );
   }
 }
 
-export async function POST(request) {
+export async function POST(request: Request) {
   try {
     const body = await request.json();
     await connectDB();
-    
+
     const newMenu = await Menu.create(body);
-    
+
     await Log.create({
       action: "TAMBAH",
       menuName: body.name,
-      details: `Menambahkan menu baru ke kategori ${body.category}`
+      details: `Menambahkan menu baru ke kategori ${body.category}`,
     });
 
     return NextResponse.json(newMenu, { status: 201 });
-  } catch (error) {
+  } catch (error: any) {
     console.error("🔥 Error POST Menu:", error.message);
     return NextResponse.json({ message: "Gagal simpan data" }, { status: 500 });
   }
 }
 
-export async function PATCH(request) {
+export async function PATCH(request: Request) {
   try {
     const { isAvailable } = await request.json();
     await connectDB();
@@ -44,12 +47,20 @@ export async function PATCH(request) {
     await Log.create({
       action: "BULK",
       menuName: "Semua Menu",
-      details: `Mengubah status semua menu menjadi ${isAvailable ? "Tersedia" : "Sold Out"}`
+      details: `Mengubah status semua menu menjadi ${
+        isAvailable ? "Tersedia" : "Sold Out"
+      }`,
     });
 
-    return NextResponse.json({ message: "Berhasil update masal" }, { status: 200 });
-  } catch (error) {
+    return NextResponse.json(
+      { message: "Berhasil update masal" },
+      { status: 200 },
+    );
+  } catch (error: any) {
     console.error("🔥 Error PATCH Menu:", error.message);
-    return NextResponse.json({ message: "Gagal update masal" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Gagal update masal" },
+      { status: 500 },
+    );
   }
 }

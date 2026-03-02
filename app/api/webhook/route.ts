@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import Order from "../../../models/Order"; // Pastikan path ini sesuai dengan yang berhasil tadi
+import Order from "@/models/Order";
 
-export async function POST(request) {
+export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { order_id, transaction_status, fraud_status } = body;
@@ -33,16 +33,21 @@ export async function POST(request) {
     }
 
     // 3. Update status di MongoDB
+    // Hanya update jika status bukan pending (karena default di DB sudah pending)
+    // atau jika status berubah menjadi success/failed
     if (newStatus !== "pending") {
       await Order.findOneAndUpdate(
         { orderId: order_id },
         { status: newStatus },
-        { new: true }
+        { new: true },
       );
     }
 
-    return NextResponse.json({ message: "Webhook received", status: newStatus });
-  } catch (error) {
+    return NextResponse.json({
+      message: "Webhook received",
+      status: newStatus,
+    });
+  } catch (error: any) {
     console.error("Webhook Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

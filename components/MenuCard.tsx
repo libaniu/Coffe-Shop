@@ -2,15 +2,37 @@
 import React, { useState } from "react";
 import { Check, ShoppingCart } from "lucide-react";
 
-const MenuCard = ({ item, onAddToCart }) => {
+interface Variant {
+  label: string;
+  price: number;
+}
+
+interface MenuItem {
+  _id: string;
+  name: string;
+  category: string;
+  desc: string;
+  img: string;
+  isAvailable: boolean;
+  variants?: Variant[];
+}
+
+interface MenuCardProps {
+  item: MenuItem;
+  onAddToCart: (variant: Variant) => void;
+}
+
+const MenuCard: React.FC<MenuCardProps> = ({ item, onAddToCart }) => {
   const [isAnimating, setIsAnimating] = useState(false);
 
-  const [selectedVariant, setSelectedVariant] = useState(
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(
     item.variants?.[0] || null,
   );
 
   // --- FUNGSI HANDLER GAMBAR ERROR (PENTING) ---
-  const handleImageError = (e) => {
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>,
+  ) => {
     e.currentTarget.src =
       "https://placehold.co/600x600/e2e8f0/475569?text=No+Image";
     e.currentTarget.onerror = null;

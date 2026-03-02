@@ -7,7 +7,6 @@ const Story = () => {
     <section id="story" className="py-24 bg-[#faf9f6] overflow-hidden">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row items-center gap-16">
-          
           {/* BAGIAN GAMBAR - Visualisasi Kehangatan */}
           <div className="w-full md:w-1/2 relative">
             <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl transform md:-rotate-2 hover:rotate-0 transition-transform duration-500">
@@ -25,28 +24,44 @@ const Story = () => {
           </div>
 
           {/* BAGIAN TEKS - Narasi Ruang Nadi */}
-          <div className="w-full md:w-1/2 space-y-8">
+          <div className="w-full md:w-1/2 space-y-8 pt-0">
             <div className="space-y-2">
               <span className="text-amber-600 font-bold tracking-[0.3em] uppercase text-xs">
                 Our Philosophy
               </span>
               <h2 className="text-4xl md:text-5xl font-serif font-bold text-[#2d241e] leading-tight">
-                Lebih dari Sekadar <br /> 
-                <span className="italic font-light text-amber-800">Ruang Menunggu.</span>
+                Lebih dari Sekadar <br />
+                <span className="italic font-light text-amber-800">
+                  Ruang Menunggu.
+                </span>
               </h2>
             </div>
 
             <div className="space-y-6 text-stone-600 leading-relaxed text-lg font-light">
               <p>
-                Terletak di jantung <span className="font-semibold text-[#2d241e]">Radio Dalam</span>, Ruang Nadi lahir dari sebuah ide sederhana: menyediakan tempat di mana waktu seolah melambat di tengah hiruk-pikuk Jakarta.
-              </p>
-              
-              <p>
-                Nama <span className="italic font-medium text-[#2d241e]">"Nadi"</span> dipilih sebagai simbol kehidupan. Kami percaya bahwa setiap cangkir kopi yang kami sajikan memiliki detak ceritanya sendiri—baik itu obrolan hangat bersama kawan lama, hingga momen refleksi diri di sore hari.
+                Terletak di jantung{" "}
+                <span className="font-semibold text-[#2d241e]">
+                  Radio Dalam
+                </span>
+                , Ruang Nadi lahir dari sebuah ide sederhana: menyediakan tempat
+                di mana waktu seolah melambat di tengah hiruk-pikuk Jakarta.
               </p>
 
               <p>
-                Kami tidak hanya menjual kopi; kami merawat koneksi. Dengan biji pilihan dan sentuhan artisanal, kami ingin menjadi saksi dari setiap detak inspirasi yang muncul di meja-meja kami.
+                Nama{" "}
+                <span className="italic font-medium text-[#2d241e]">
+                  "Nadi"
+                </span>{" "}
+                dipilih sebagai simbol kehidupan. Kami percaya bahwa setiap
+                cangkir kopi yang kami sajikan memiliki detak ceritanya
+                sendiri—baik itu obrolan hangat bersama kawan lama, hingga momen
+                refleksi diri di sore hari.
+              </p>
+
+              <p>
+                Kami tidak hanya menjual kopi; kami merawat koneksi. Dengan biji
+                pilihan dan sentuhan artisanal, kami ingin menjadi saksi dari
+                setiap detak inspirasi yang muncul di meja-meja kami.
               </p>
             </div>
 
@@ -60,7 +75,6 @@ const Story = () => {
               </p>
             </div>
           </div>
-
         </div>
       </div>
     </section>

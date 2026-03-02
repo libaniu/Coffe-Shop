@@ -219,9 +219,9 @@ export default function Home() {
       <Hero />
       <Story />
 
-      <section id="menu" className="py-20 px-8 container mx-auto">
+      <section id="menu" className="py-20 px-8 container mx-auto pt-10">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-serif font-bold text-[#2d241e] mb-4">
+          <h2 className="text-4xl font-serif font-bold text-[#2d241e] mb-4 ">
             Menu Kami
           </h2>
           <div className="w-20 h-1 bg-amber-600 mx-auto mb-10"></div>

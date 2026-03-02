@@ -1,20 +1,40 @@
-import mongoose from "mongoose";
+import mongoose, { Schema, Document, Model } from "mongoose";
 
-const OrderSchema = new mongoose.Schema(
+interface IOrderItem {
+  _id?: string;
+  name: string;
+  price: number;
+  quantity: number;
+  variant: string;
+  image?: string;
+}
+
+interface IOrder extends Document {
+  orderId: string;
+  customerName: string;
+  customerPhone: string;
+  totalPrice: number;
+  status: string;
+  items: IOrderItem[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const OrderSchema: Schema = new Schema(
   {
     // ID Unik Pesanan (RN-xxxx)
     orderId: { type: String, required: true, unique: true },
-    
+
     // Data Customer (Pastikan camelCase agar cocok dengan tokenizer)
     customerName: { type: String, required: true },
     customerPhone: { type: String, required: true },
-    
+
     // Total Harga
     totalPrice: { type: Number, required: true },
-    
+
     // Status (pending, success, completed, failed)
     status: { type: String, default: "pending" },
-    
+
     // Rincian Item (Agar tidak error saat di-map)
     items: [
       {
@@ -27,8 +47,11 @@ const OrderSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Mencegah error "OverwriteModelError" saat hot-reload Next.js
-export default mongoose.models.Order || mongoose.model("Order", OrderSchema);
+const Order: Model<IOrder> =
+  mongoose.models.Order || mongoose.model<IOrder>("Order", OrderSchema);
+
+export default Order;

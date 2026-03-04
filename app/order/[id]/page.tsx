@@ -3,6 +3,7 @@
 import { use, useState, useEffect } from "react";
 import useSWR from "swr";
 import Link from "next/link";
+import type { IOrderItem } from "@/models/Order";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -136,14 +137,13 @@ export default function OrderStatusPage({
         </div>
 
         {/* List Items */}
-        {/* List Items */}
         <div className="border-t border-dashed border-stone-200 py-3">
           <p className="text-[10px] font-black uppercase text-stone-400 tracking-widest mb-2">
             Rincian Menu
           </p>
           <div className="space-y-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar">
             {/* PERBAIKAN: Tambahkan '?' setelah items dan fallback '|| []' */}
-            {(order.items || []).map((item: any, idx: number) => (
+            {(order.items || []).map((item: IOrderItem, idx: number) => (
               <div
                 key={idx}
                 className="flex justify-between items-start text-sm gap-4"

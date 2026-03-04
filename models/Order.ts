@@ -1,6 +1,13 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, {
+  Schema,
+  Document,
+  Model,
+  models,
+  model,
+  Types,
+} from "mongoose";
 
-interface IOrderItem {
+export interface IOrderItem {
   _id?: string;
   name: string;
   price: number;
@@ -9,18 +16,25 @@ interface IOrderItem {
   image?: string;
 }
 
-interface IOrder extends Document {
+export interface IOrder {
+  _id: string;
   orderId: string;
   customerName: string;
   customerPhone: string;
   totalPrice: number;
   status: string;
   items: IOrderItem[];
+  createdAt: string | Date;
+  updatedAt?: string | Date;
+}
+
+interface IOrderDocument extends Omit<IOrder, "_id">, Document {
+  _id: Types.ObjectId; // <--- GANTI 'string' JADI 'Types.ObjectId'
   createdAt: Date;
   updatedAt: Date;
 }
 
-const OrderSchema: Schema = new Schema(
+const OrderSchema = new Schema<IOrderDocument>(
   {
     // ID Unik Pesanan (RN-xxxx)
     orderId: { type: String, required: true, unique: true },
@@ -38,12 +52,12 @@ const OrderSchema: Schema = new Schema(
     // Rincian Item (Agar tidak error saat di-map)
     items: [
       {
-        _id: String,
-        name: String,
-        price: Number,
-        quantity: Number,
-        variant: String,
-        image: String,
+        productId: { type: String, required: true }, // Simpan ID produk di sini
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+        quantity: { type: Number, required: true },
+        variant: { type: String, required: true },
+        image: { type: String },
       },
     ],
   },
@@ -51,7 +65,6 @@ const OrderSchema: Schema = new Schema(
 );
 
 // Mencegah error "OverwriteModelError" saat hot-reload Next.js
-const Order: Model<IOrder> =
-  mongoose.models.Order || mongoose.model<IOrder>("Order", OrderSchema);
+const Order = models.Order || model<IOrderDocument>("Order", OrderSchema);
 
 export default Order;

@@ -1,19 +1,20 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model, models, model, Types } from "mongoose";
 
 export interface IVariant {
   label: string;
   price: number;
 }
 
-export interface IMenu extends Document {
+export interface IMenu {
+  _id: string;
   name: string;
   variants: IVariant[];
   category: string;
   desc?: string;
   img?: string;
   isAvailable: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
 }
 
 const MenuSchema: Schema = new Schema(
@@ -35,7 +36,12 @@ const MenuSchema: Schema = new Schema(
 );
 
 // Cek apakah model sudah ada di cache agar tidak error "OverwriteModelError"
-const Menu: Model<IMenu> =
-  mongoose.models.Menu || mongoose.model<IMenu>("Menu", MenuSchema);
+// Kita gunakan interface IMenu & Document untuk Model Mongoose
+interface IMenuDocument extends Omit<IMenu, "_id">, Document {
+  _id: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
+const Menu = models.Menu || model<IMenuDocument>("Menu", MenuSchema);
 export default Menu;

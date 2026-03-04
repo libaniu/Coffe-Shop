@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import useSWR from "swr";
+import { ArrowUp } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Story from "@/components/Story";
@@ -58,6 +59,21 @@ export default function Home() {
     }
   }, [currentPage]);
   // 👆 --- END FIX ---
+
+  // --- SCROLL TO TOP LOGIC ---
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const [toast, setToast] = useState({ show: false, message: "", type: "" });
 
@@ -173,6 +189,9 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#faf9f6] relative">
+      {/* Global Smooth Scroll & Scroll Padding */}
+      <style dangerouslySetInnerHTML={{ __html: `html { scroll-behavior: smooth; scroll-padding-top: 6rem; }` }} />
+
       {/* Toast Notification */}
       <div
         className={`fixed bottom-10 left-1/2 transform -translate-x-1/2 z-100 transition-all duration-300 ${
@@ -430,6 +449,19 @@ export default function Home() {
         }
         onClearCart={clearCart}
       />
+
+      {/* Scroll To Top Button */}
+      <button
+        onClick={scrollToTop}
+        className={`fixed bottom-24 right-6 md:bottom-10 md:right-10 bg-white text-[#2d241e] w-12 h-12 rounded-full shadow-lg z-40 flex items-center justify-center hover:bg-stone-100 transition-all duration-300 border border-stone-200 ${
+          showScrollTop
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-10 pointer-events-none"
+        }`}
+        aria-label="Scroll to top"
+      >
+        <ArrowUp size={20} strokeWidth={2.5} />
+      </button>
 
       {/* Floating Cart Button (Mobile Only) */}
       {cart.length > 0 && (

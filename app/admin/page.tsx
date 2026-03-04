@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import AdminDashboard from "./components/AdminDashboard";
@@ -11,7 +12,7 @@ import type { IOrder } from "@/models/Order";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-function AdminDashboardPage() {
+function AdminDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -22,7 +23,7 @@ function AdminDashboardPage() {
 
   // Tambah tab DASHBOARD
   const [activeTab, setActiveTab] = useState<"DASHBOARD" | "MENU" | "ORDERS">(
-    initialTab,
+    initialTab as "DASHBOARD" | "MENU" | "ORDERS"
   );
 
   // --- DATA STATES ---
@@ -59,7 +60,7 @@ function AdminDashboardPage() {
   useEffect(() => {
     const tab = searchParams.get("tab")?.toUpperCase();
     if (tab === "MENU" || tab === "ORDERS" || tab === "DASHBOARD") {
-      setActiveTab(tab);
+      setActiveTab(tab as "DASHBOARD" | "MENU" | "ORDERS");
     }
   }, [searchParams]);
 
@@ -158,4 +159,16 @@ function AdminDashboardPage() {
   );
 }
 
-export default AdminDashboardPage;
+export default function AdminPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-stone-50 text-stone-500 font-bold">
+          Loading Dashboard...
+        </div>
+      }
+    >
+      <AdminDashboardContent />
+    </Suspense>
+  );
+}

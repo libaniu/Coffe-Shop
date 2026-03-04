@@ -11,7 +11,7 @@ import type { IOrder } from "@/models/Order";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-export default function AdminDashboardPage() {
+function AdminDashboardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 

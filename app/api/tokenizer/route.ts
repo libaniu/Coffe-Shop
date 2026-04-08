@@ -44,7 +44,8 @@ export async function POST(request: Request) {
       totalPrice: price,
       status: "pending",
       items: items.map((item) => ({
-        _id: item.id,
+        // PERBAIKAN DI SINI: Ganti _id menjadi productId
+        productId: item.id, 
         name: item.name,
         price: item.price,
         quantity: item.quantity,

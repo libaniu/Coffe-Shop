@@ -217,7 +217,7 @@ export default function AdminDashboard({
           <h3 className="text-xl font-bold text-stone-800 mb-6">
             Rincian Penjualan
           </h3>
-          <div className="overflow-x-auto max-h-96 custom-scrollbar">
+          <div className="overflow-auto max-h-96 custom-scrollbar pr-4">
             <table className="w-full text-left">
               <thead className="text-[10px] uppercase font-bold text-stone-400 border-b border-stone-100 sticky top-0 bg-white z-10">
                 <tr>

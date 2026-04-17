@@ -14,8 +14,8 @@ export default function AdminMenu({
   isLoadingMenu,
   fetchMenu,
 }: AdminMenuProps) {
-  const categories = ["Semua", "Coffee", "Non-Coffee", "Pastry", "Food"];
-  const [selectedCategory, setSelectedCategory] = useState("Semua");
+  const categories = ["All", "Coffee", "Non-Coffee", "Pastry", "Food"];
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -28,7 +28,8 @@ export default function AdminMenu({
   const [editImagePreview, setEditImagePreview] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("Berhasil Disimpan!");
+  const [successMessage, setSuccessMessage] = useState("Successfully Saved!");
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   
   // State Delete Modal
   const [deleteModal, setDeleteModal] = useState({
@@ -61,7 +62,7 @@ export default function AdminMenu({
   ) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 1024 * 1024) return alert("Maksimal 1MB");
+      if (file.size > 1024 * 1024) return alert("Max 1MB");
       const reader = new FileReader();
       reader.onloadend = () => {
         const res = reader.result as string;
@@ -116,7 +117,7 @@ export default function AdminMenu({
 
   const handleSaveMenu = async () => {
     if (!newMenu.name || !newMenu.img || newMenu.variants.length === 0)
-      return alert("Data belum lengkap!");
+      return alert("Incomplete data!");
     
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { _id, ...menuData } = newMenu; // Buang _id kosong
@@ -128,7 +129,7 @@ export default function AdminMenu({
     });
     
     if (res.ok) {
-      setSuccessMessage("Berhasil Disimpan!");
+      setSuccessMessage("Successfully Saved!");
       setShowSuccessModal(true);
       setNewMenu({
         _id: "",
@@ -140,6 +141,7 @@ export default function AdminMenu({
         isAvailable: true,
       });
       setImagePreview(null);
+      setIsAddFormOpen(false);
       fetchMenu();
     }
   };
@@ -157,7 +159,7 @@ export default function AdminMenu({
     
     if (res.ok) {
       setIsEditModalOpen(false);
-      setSuccessMessage("Berhasil Disimpan!");
+      setSuccessMessage("Successfully Saved!");
       setShowSuccessModal(true);
       fetchMenu();
     }
@@ -184,7 +186,7 @@ export default function AdminMenu({
     });
     if (res.ok) {
       setDeleteModal({ show: false, id: "", name: "" });
-      setSuccessMessage("Berhasil Dihapus!");
+      setSuccessMessage("Successfully Deleted!");
       setShowSuccessModal(true);
       fetchMenu();
     }
@@ -198,7 +200,7 @@ export default function AdminMenu({
     });
     if (res.ok) {
       setBulkModal({ ...bulkModal, show: false });
-      setSuccessMessage("Status Berhasil Diubah!");
+      setSuccessMessage("Status Successfully Changed!");
       setShowSuccessModal(true);
       fetchMenu();
     }
@@ -220,7 +222,7 @@ export default function AdminMenu({
   const filteredMenu = menuList
     .filter(
       (item) =>
-        (selectedCategory === "Semua" || item.category === selectedCategory) &&
+        (selectedCategory === "All" || item.category === selectedCategory) &&
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
@@ -254,16 +256,73 @@ export default function AdminMenu({
   // --- RETURN STATEMENT SEKARANG AMAN ---
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* --- KONTROL ATAS: Actions, Filter & Search --- */}
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-6 bg-white p-4 rounded-3xl shadow-sm border border-stone-200">
+        <div className="flex flex-wrap gap-2 w-full xl:w-auto">
+          <button
+            onClick={() => setIsAddFormOpen(!isAddFormOpen)}
+            className={`w-full md:w-auto justify-center px-5 py-2.5 rounded-2xl text-sm font-bold shadow-sm transition-all flex items-center gap-2 border ${
+              isAddFormOpen
+                ? "bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200"
+                : "bg-[#2d241e] text-white border-[#2d241e] hover:bg-amber-900 hover:shadow-md active:scale-95"
+            }`}
+          >
+            {isAddFormOpen ? "✕ Close Form" : "+ Add Menu"}
+          </button>
+          <button
+            onClick={() => setBulkModal({ show: true, targetStatus: true })}
+            className="flex-1 md:flex-none text-center px-4 py-2.5 bg-green-50 text-green-700 rounded-2xl text-[10px] font-bold uppercase border border-green-100 hover:bg-green-100 transition-colors"
+          >
+            ✅ Stock All
+          </button>
+          <button
+            onClick={() => setBulkModal({ show: true, targetStatus: false })}
+            className="flex-1 md:flex-none text-center px-4 py-2.5 bg-red-50 text-red-700 rounded-2xl text-[10px] font-bold uppercase border border-red-100 hover:bg-red-100 transition-colors"
+          >
+            🚫 Sold All
+          </button>
+        </div>
+
+        <div className="flex flex-col md:flex-row gap-3 w-full xl:w-auto overflow-hidden">
+          <div className="flex overflow-x-auto pb-1 gap-2 custom-scrollbar">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-5 py-2 rounded-full text-xs font-bold border shrink-0 transition-all ${
+                  selectedCategory === cat
+                    ? "bg-[#2d241e] text-white border-[#2d241e] shadow-md"
+                    : "bg-stone-50 text-stone-500 border-stone-200 hover:border-amber-400 hover:text-amber-700"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          <div className="relative w-full md:w-64 shrink-0">
+            <input
+              type="text"
+              placeholder="Search Menu..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-sm outline-none focus:border-amber-500 focus:bg-white transition-all shadow-inner"
+            />
+            <span className="absolute left-3 top-2.5 opacity-50">🔍</span>
+          </div>
+        </div>
+      </div>
+
       {/* Form Tambah Menu */}
-      <div className="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-stone-200 mb-10">
+      {isAddFormOpen && (
+        <div className="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-stone-200 mb-10 animate-in slide-in-from-top-4 fade-in duration-300">
         <h2 className="text-xl font-bold mb-6 italic text-stone-700">
-          Tambah Menu Baru
+          Add New Menu
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-4">
             <input
               type="text"
-              placeholder="Nama Menu"
+              placeholder="Menu Name"
               value={newMenu.name}
               onChange={(e) =>
                 setNewMenu({ ...newMenu, name: e.target.value })
@@ -271,7 +330,7 @@ export default function AdminMenu({
               className="w-full p-4 bg-stone-50 rounded-2xl outline-none focus:ring-2 focus:ring-amber-600"
             />
             <textarea
-              placeholder="Deskripsi"
+              placeholder="Description"
               value={newMenu.desc}
               rows={2}
               onChange={(e) =>
@@ -287,7 +346,7 @@ export default function AdminMenu({
               className="w-full p-4 bg-stone-50 rounded-2xl outline-none cursor-pointer"
             >
               {categories
-                .filter((c) => c !== "Semua")
+                .filter((c) => c !== "All")
                 .map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -296,7 +355,7 @@ export default function AdminMenu({
             </select>
             <div className="bg-stone-50 p-5 rounded-3xl border border-stone-100">
               <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-3 block">
-                Varian & Harga
+                Variants & Price
               </label>
               <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
                 {newMenu.variants.map((v, i) => (
@@ -312,7 +371,7 @@ export default function AdminMenu({
                     />
                     <input
                       type="number"
-                      placeholder="Harga"
+                      placeholder="Price"
                       value={v.price}
                       onChange={(e) =>
                         handleVariantChange(
@@ -337,7 +396,7 @@ export default function AdminMenu({
                 onClick={() => modifyVariantCount("add")}
                 className="w-full mt-3 py-2 border-2 border-dashed border-stone-200 text-stone-400 rounded-xl text-xs font-bold hover:border-amber-400 hover:text-amber-600 transition-colors"
               >
-                + Tambah Varian
+                + Add Variant
               </button>
             </div>
             <input
@@ -354,7 +413,7 @@ export default function AdminMenu({
                 alt="Preview"
               />
             ) : (
-              <p className="text-stone-400 text-sm italic">Preview Foto</p>
+              <p className="text-stone-400 text-sm italic">Photo Preview</p>
             )}
           </div>
         </div>
@@ -362,52 +421,10 @@ export default function AdminMenu({
           onClick={handleSaveMenu}
           className="w-full mt-8 bg-[#2d241e] text-white py-4 rounded-2xl font-bold hover:bg-amber-900 shadow-lg active:scale-[0.98]"
         >
-          Simpan Menu
+          Save Menu
         </button>
       </div>
-
-      {/* List Menu & Filter */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="flex gap-2">
-          <button
-            onClick={() => setBulkModal({ show: true, targetStatus: true })}
-            className="px-4 py-3 bg-green-50 text-green-700 rounded-2xl text-[10px] font-bold uppercase border border-green-100"
-          >
-            ✅ Stock All
-          </button>
-          <button
-            onClick={() => setBulkModal({ show: true, targetStatus: false })}
-            className="px-4 py-3 bg-red-50 text-red-700 rounded-2xl text-[10px] font-bold uppercase border border-red-100"
-          >
-            🚫 Sold All
-          </button>
-        </div>
-        <div className="flex-1 overflow-x-auto pb-1 flex gap-2 scrollbar-hide">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-5 py-2 rounded-full text-xs font-bold border shrink-0 ${
-                selectedCategory === cat
-                  ? "bg-[#2d241e] text-white border-[#2d241e]"
-                  : "bg-white text-stone-500 border-stone-200"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-        <div className="relative w-full md:w-64">
-          <input
-            type="text"
-            placeholder="Cari..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-stone-200 rounded-2xl text-sm outline-none shadow-sm"
-          />
-          <span className="absolute left-3 top-2.5">🔍</span>
-        </div>
-      </div>
+      )}
 
       {/* Table Menu (Desktop) */}
       <div className="bg-white rounded-[2.5rem] shadow-sm border border-stone-200 overflow-hidden hidden md:block">
@@ -426,7 +443,7 @@ export default function AdminMenu({
                 className="px-6 py-6 cursor-pointer hover:text-stone-700 transition-colors select-none"
                 onClick={() => handleSort("category")}
               >
-                Kategori{" "}
+                Category{" "}
                 {sortConfig?.key === "category" &&
                   (sortConfig.direction === "asc" ? "↑" : "↓")}
               </th>
@@ -434,7 +451,7 @@ export default function AdminMenu({
                 className="px-6 py-6 cursor-pointer hover:text-stone-700 transition-colors select-none"
                 onClick={() => handleSort("price")}
               >
-                Harga{" "}
+                Price{" "}
                 {sortConfig?.key === "price" &&
                   (sortConfig.direction === "asc" ? "↑" : "↓")}
               </th>
@@ -446,7 +463,7 @@ export default function AdminMenu({
                 {sortConfig?.key === "isAvailable" &&
                   (sortConfig.direction === "asc" ? "↑" : "↓")}
               </th>
-              <th className="px-6 py-6 text-left">Aksi</th>
+              <th className="px-6 py-6 text-left">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-50">
@@ -502,7 +519,7 @@ export default function AdminMenu({
                             : "bg-red-100 text-red-700"
                         }`}
                       >
-                        {item.isAvailable ? "Ready" : "Sold Out"}
+                        {item.isAvailable ? "Available" : "Sold Out"}
                       </button>
                     </td>
                     <td className="px-6 py-4 text-left space-x-2">
@@ -526,7 +543,7 @@ export default function AdminMenu({
                         }
                         className="px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold"
                       >
-                        Hapus
+                        Delete
                       </button>
                     </td>
                   </tr>
@@ -588,7 +605,7 @@ export default function AdminMenu({
                         : "bg-red-100 text-red-700"
                     }`}
                   >
-                    {item.isAvailable ? "Ready" : "Habis"}
+                    {item.isAvailable ? "Available" : "Sold Out"}
                   </button>
                   <button
                     onClick={() => {
@@ -610,7 +627,7 @@ export default function AdminMenu({
                     }
                     className="px-4 py-2 bg-red-50 text-red-500 rounded-xl text-[10px] font-bold"
                   >
-                    Hapus
+                    Delete
                   </button>
                 </div>
               </div>
@@ -619,8 +636,8 @@ export default function AdminMenu({
 
       {/* --- MODALS (EDIT, DELETE, SUCCESS) --- */}
       {isEditModalOpen && editingData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-md">
-          <div className="bg-white rounded-[2.5rem] w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-white rounded-[2.5rem] w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] animate-in zoom-in-95 duration-300">
             <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
               <h2 className="text-2xl font-serif font-bold mb-6">Edit Menu</h2>
               <div className="space-y-4">
@@ -651,7 +668,7 @@ export default function AdminMenu({
                   className="w-full p-4 bg-stone-50 rounded-2xl outline-none cursor-pointer"
                 >
                   {categories
-                    .filter((c) => c !== "Semua")
+                .filter((c) => c !== "All")
                     .map((c) => (
                       <option key={c} value={c}>
                         {c}
@@ -660,7 +677,7 @@ export default function AdminMenu({
                 </select>
                 <div className="bg-stone-50 p-5 rounded-3xl border border-stone-100">
                   <label className="text-[10px] font-black text-stone-400 uppercase tracking-widest mb-3 block">
-                    Varian
+                Variant
                   </label>
                   <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
                     {editingData.variants.map((v, i) => (
@@ -707,7 +724,7 @@ export default function AdminMenu({
                     }
                     className="w-full mt-3 py-2 border-2 border-dashed border-stone-200 text-stone-400 rounded-xl text-xs font-bold hover:border-amber-400 hover:text-amber-600 transition-colors"
                   >
-                    + Tambah Varian
+                    + Add Variant
                   </button>
                 </div>
               </div>
@@ -730,7 +747,7 @@ export default function AdminMenu({
                   )}
                   <label className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                     <span className="text-white text-xs font-bold bg-black/50 px-4 py-2 rounded-full backdrop-blur-sm">
-                      Ganti Foto
+                      Change Photo
                     </span>
                     <input
                       type="file"
@@ -745,13 +762,13 @@ export default function AdminMenu({
                   onClick={handleUpdateMenu}
                   className="w-full py-4 bg-[#2d241e] text-white rounded-2xl font-bold shadow-lg hover:bg-amber-900 active:scale-[0.98]"
                 >
-                  Simpan Perubahan
+                  Save Changes
                 </button>
                 <button
                   onClick={() => setIsEditModalOpen(false)}
                   className="w-full py-4 bg-white text-stone-500 rounded-2xl font-bold border border-stone-200 hover:bg-stone-50"
                 >
-                  Batal
+                  Cancel
                 </button>
               </div>
             </div>
@@ -761,11 +778,11 @@ export default function AdminMenu({
 
       {/* Delete & Success Modals */}
       {deleteModal.show && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-4xl p-8 max-w-sm w-full text-center shadow-2xl">
-            <h3 className="text-xl font-bold mb-2">Hapus Menu?</h3>
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-4xl p-8 max-w-sm w-full text-center shadow-2xl animate-in zoom-in-95 duration-300">
+            <h3 className="text-xl font-bold mb-2">Delete Menu?</h3>
             <p className="text-stone-500 mb-6 text-sm">
-              Hapus "{deleteModal.name}" secara permanen?
+              Delete "{deleteModal.name}" permanently?
             </p>
             <div className="flex gap-3">
               <button
@@ -774,21 +791,21 @@ export default function AdminMenu({
                 }
                 className="flex-1 py-3 bg-stone-100 rounded-xl font-bold"
               >
-                Batal
+                Cancel
               </button>
               <button
                 onClick={confirmDelete}
                 className="flex-1 py-3 bg-red-500 text-white rounded-xl font-bold"
               >
-                Hapus
+                Delete
               </button>
             </div>
           </div>
         </div>
       )}
       {showSuccessModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm">
-          <div className="bg-white px-10 py-8 rounded-4xl shadow-2xl flex flex-col items-center animate-in zoom-in-95">
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white px-10 py-8 rounded-4xl shadow-2xl flex flex-col items-center animate-in zoom-in-95 duration-300">
             <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-3xl mb-4">
               ✓
             </div>
@@ -805,11 +822,11 @@ export default function AdminMenu({
         </div>
       )}
       {bulkModal.show && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-4xl p-8 max-w-sm w-full text-center shadow-2xl">
-            <h3 className="text-xl font-bold mb-4">Konfirmasi Status</h3>
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-stone-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-4xl p-8 max-w-sm w-full text-center shadow-2xl animate-in zoom-in-95 duration-300">
+            <h3 className="text-xl font-bold mb-4">Confirm Status</h3>
             <p className="text-stone-500 mb-6 text-sm">
-              Ubah SEMUA menu jadi{" "}
+              Change ALL menus to{" "}
               {bulkModal.targetStatus ? "Available" : "Sold Out"}?
             </p>
             <div className="flex gap-3">
@@ -817,13 +834,13 @@ export default function AdminMenu({
                 onClick={() => setBulkModal({ ...bulkModal, show: false })}
                 className="flex-1 py-3 bg-stone-100 rounded-xl font-bold"
               >
-                Batal
+                Cancel
               </button>
               <button
                 onClick={executeBulkStatus}
                 className="flex-1 py-3 bg-[#2d241e] text-white rounded-xl font-bold"
               >
-                Ya
+                Yes
               </button>
             </div>
           </div>

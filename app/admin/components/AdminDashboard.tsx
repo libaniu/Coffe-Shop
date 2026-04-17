@@ -58,7 +58,7 @@ export default function AdminDashboard({
       const d = new Date();
       d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split("T")[0];
-      const dayName = d.toLocaleDateString("id-ID", { weekday: "short" });
+      const dayName = d.toLocaleDateString("en-US", { weekday: "short" });
 
       const dailyTotal = completedOrders
         .filter(
@@ -141,7 +141,7 @@ export default function AdminDashboard({
                 : "text-stone-500"
             }`}
           >
-            Harian
+            Daily
           </button>
           <button
             onClick={() => setFilterType("monthly")}
@@ -151,12 +151,12 @@ export default function AdminDashboard({
                 : "text-stone-500"
             }`}
           >
-            Bulanan
+            Monthly
           </button>
         </div>
         <div className="flex items-center gap-3 w-full md:w-auto">
           <span className="text-sm font-bold text-stone-500 whitespace-nowrap">
-            Periode:
+            Period:
           </span>
           {filterType === "daily" ? (
             <input
@@ -181,7 +181,7 @@ export default function AdminDashboard({
         <div className="bg-white p-6 rounded-4xl shadow-sm border border-stone-200 relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-32 h-32 bg-green-50 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
           <p className="text-stone-400 text-xs font-bold uppercase tracking-widest relative z-10">
-            Pendapatan (
+            Revenue (
             {filterType === "daily" ? dashboardDate : dashboardMonth})
           </p>
           <h3 className="text-3xl font-black text-stone-800 mt-2 relative z-10">
@@ -191,19 +191,19 @@ export default function AdminDashboard({
         <div className="bg-white p-6 rounded-4xl shadow-sm border border-stone-200 relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-32 h-32 bg-amber-50 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
           <p className="text-stone-400 text-xs font-bold uppercase tracking-widest relative z-10">
-            Pesanan Selesai
+            Completed Orders
           </p>
           <h3 className="text-3xl font-black text-stone-800 mt-2 relative z-10">
             {dashboardStats.totalOrders}{" "}
             <span className="text-lg font-normal text-stone-400">
-              Transaksi
+              Transactions
             </span>
           </h3>
         </div>
         <div className="bg-white p-6 rounded-4xl shadow-sm border border-stone-200 relative overflow-hidden group">
           <div className="absolute right-0 top-0 w-32 h-32 bg-blue-50 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform"></div>
           <p className="text-stone-400 text-xs font-bold uppercase tracking-widest relative z-10">
-            Rata-rata / Order
+            Average / Order
           </p>
           <h3 className="text-3xl font-black text-stone-800 mt-2 relative z-10">
             {formatRupiah(dashboardStats.avgOrder)}
@@ -215,14 +215,14 @@ export default function AdminDashboard({
         {/* ITEM TERJUAL SECTION */}
         <div className="lg:col-span-2 bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-stone-200">
           <h3 className="text-xl font-bold text-stone-800 mb-6">
-            Rincian Penjualan
+            Sales Details
           </h3>
           <div className="overflow-auto max-h-96 custom-scrollbar pr-4">
             <table className="w-full text-left">
               <thead className="text-[10px] uppercase font-bold text-stone-400 border-b border-stone-100 sticky top-0 bg-white z-10">
                 <tr>
                   <th className="pb-3">Menu</th>
-                  <th className="pb-3">Varian</th>
+                  <th className="pb-3">Variant</th>
                   <th className="pb-3 text-center">Qty</th>
                   <th className="pb-3 text-right">Total</th>
                 </tr>
@@ -234,7 +234,7 @@ export default function AdminDashboard({
                       colSpan={4}
                       className="py-8 text-center text-stone-400 italic"
                     >
-                      Tidak ada penjualan di periode ini.
+                      No sales in this period.
                     </td>
                   </tr>
                 ) : (
@@ -264,7 +264,7 @@ export default function AdminDashboard({
 
         {/* Status Hari Ini */}
         <div className="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-stone-200">
-          <h3 className="text-xl font-bold text-stone-800 mb-6">Status Menu</h3>
+          <h3 className="text-xl font-bold text-stone-800 mb-6">Menu Status</h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center p-4 bg-stone-50 rounded-2xl">
               <div className="flex items-center gap-3">
@@ -308,9 +308,9 @@ export default function AdminDashboard({
       {/* GRAFIK PENJUALAN */}
       <div className="bg-white p-6 md:p-8 rounded-[2.5rem] shadow-sm border border-stone-200">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-bold text-stone-800">Trend Penjualan</h3>
+          <h3 className="text-xl font-bold text-stone-800">Sales Trend</h3>
           <span className="text-xs bg-stone-100 px-3 py-1 rounded-full text-stone-500 font-bold">
-            7 Hari Terakhir
+            Last 7 Days
           </span>
         </div>
         <div className="h-80 w-full">
@@ -350,7 +350,7 @@ export default function AdminDashboard({
                   border: "none",
                   boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
                 }}
-                formatter={(value: any) => [formatRupiah(value), "Omzet"]}
+                formatter={(value: any) => [formatRupiah(value), "Revenue"]}
               />
               <Area
                 type="monotone"

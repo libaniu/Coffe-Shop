@@ -1,6 +1,6 @@
 // c:\Users\Admin\Documents\Project\ruang-nadi\components\AdminOrders.tsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import type { IOrder } from "@/models/Order";
 
@@ -19,9 +19,9 @@ export default function AdminOrders({
   const [filterDate, setFilterDate] = useState("");
   const [filterMonth, setFilterMonth] = useState("");
   const [orderFilterType, setOrderFilterType] = useState<"daily" | "monthly">(
-    "daily"
+    "daily",
   );
-  const [filterStatus, setFilterStatus] = useState("Semua");
+  const [filterStatus, setFilterStatus] = useState("All");
 
   // --- FILTER ORDERS ---
   const filteredOrders =
@@ -32,7 +32,7 @@ export default function AdminOrders({
             (() => {
               const d = new Date(order.createdAt);
               const dateString = `${d.getFullYear()}-${String(
-                d.getMonth() + 1
+                d.getMonth() + 1,
               ).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
               return dateString === filterDate;
             })()
@@ -40,7 +40,7 @@ export default function AdminOrders({
             (() => {
               const d = new Date(order.createdAt);
               const monthString = `${d.getFullYear()}-${String(
-                d.getMonth() + 1
+                d.getMonth() + 1,
               ).padStart(2, "0")}`;
               return monthString === filterMonth;
             })();
@@ -50,7 +50,7 @@ export default function AdminOrders({
           .toLowerCase()
           .includes(orderSearchTerm.toLowerCase());
       const matchesStatus =
-        filterStatus === "Semua" || order.status === filterStatus;
+        filterStatus === "All" || order.status === filterStatus;
       return matchesDate && matchesSearch && matchesStatus;
     }) || [];
 
@@ -62,9 +62,9 @@ export default function AdminOrders({
       if (orders) {
         mutateOrders(
           orders.map((o) =>
-            o._id === orderId ? { ...o, status: newStatus } : o
+            o._id === orderId ? { ...o, status: newStatus } : o,
           ),
-          false
+          false,
         );
       }
       const res = await fetch(`/api/orders/${orderId}`, {
@@ -93,17 +93,17 @@ export default function AdminOrders({
             })
             .join("\n");
 
-          const message = `Halo Kak *${
+          const message = `Hello *${
             targetOrder.customerName
-          }*!\nPesanan Kakak dengan Order ID: *${
+          }*!\nYour order with Order ID: *${
             targetOrder.orderId
-          }*sudah SELESAI.\n\nRincian Pesanan:\n${itemsList}\nTotal: Rp ${targetOrder.totalPrice.toLocaleString(
-            "id-ID"
-          )}\n\nTerima kasih telah memesan di Ruang Nadi Coffee!`;
+          }* is COMPLETED.\n\nOrder Details:\n${itemsList}\nTotal: Rp ${targetOrder.totalPrice.toLocaleString(
+            "id-ID",
+          )}\n\nThank you for ordering at Ruang Nadi Coffee!`;
 
           window.open(
             `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
-            "_blank"
+            "_blank",
           );
         }
       }
@@ -111,6 +111,24 @@ export default function AdminOrders({
       console.error("Gagal update status:", error);
     }
   };
+
+  // --- AUTO EXPIRE PENDING ORDERS (> 30 MINS) ---
+  useEffect(() => {
+    if (!orders) return;
+
+    const now = new Date().getTime();
+    orders.forEach((order) => {
+      if (order.status === "pending") {
+        const orderTime = new Date(order.createdAt).getTime();
+        const diffMinutes = (now - orderTime) / (1000 * 60);
+
+        if (diffMinutes > 30) {
+          updateOrderStatus(order._id, "failed");
+        }
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orders]);
 
   // --- PRINT STRUK ---
   const handlePrint = (order: IOrder) => {
@@ -137,27 +155,27 @@ export default function AdminOrders({
       .join("");
     const htmlContent = `
       <html>
-        <head><title>Struk - ${
+        <head><title>Receipt - ${
           order.orderId
         }</title><style>body { font-family: 'Courier New', monospace; padding: 10px; width: 58mm; margin: 0 auto; color: #000; } .header { text-align: center; margin-bottom: 10px; border-bottom: 1px dashed #000; padding-bottom: 5px; } .title { font-weight: bold; font-size: 14px; text-transform: uppercase; } .meta { font-size: 10px; margin-bottom: 10px; line-height: 1.4; } .items { border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 5px; } .total { display: flex; justify-content: space-between; font-weight: bold; font-size: 12px; margin-top: 5px; border-top: 1px solid #000; padding-top: 5px; } .footer { text-align: center; font-size: 10px; margin-top: 15px; font-style: italic; }</style></head>
         <body>
           <div class="header"><div class="title">RUANG NADI</div><div style="font-size: 10px;">Coffee & Space</div></div>
-          <div class="meta">ID: ${order.orderId}<br/>Tgl: ${new Date(
-      order.createdAt
-    ).toLocaleString("id-ID", {
-      day: "numeric",
-      month: "numeric",
-      year: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    })}<br/>Pemesan: <b>${order.customerName}</b><br/>${
-      order.customerPhone
-    }</div>
+          <div class="meta">ID: ${order.orderId}<br/>Date: ${new Date(
+            order.createdAt,
+          ).toLocaleString("en-US", {
+            day: "numeric",
+            month: "numeric",
+            year: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          })}<br/>Customer: <b>${order.customerName}</b><br/>${
+            order.customerPhone
+          }</div>
           <div class="items">${itemsHtml}</div>
           <div class="total"><span>TOTAL</span><span>Rp ${(
             order.totalPrice || 0
           ).toLocaleString("id-ID")}</span></div>
-          <div class="footer">Terima Kasih<br/>~ Ruang Nadi ~</div>
+          <div class="footer">Thank You<br/>~ Ruang Nadi ~</div>
           <script>window.onload = function() { window.print(); window.close(); }</script>
         </body>
       </html>
@@ -169,16 +187,16 @@ export default function AdminOrders({
   // --- EXPORT EXCEL ---
   const downloadExcel = () => {
     if (!filteredOrders || filteredOrders.length === 0)
-      return alert("Belum ada data pesanan untuk di-download.");
+      return alert("No order data to download.");
     const dataToExport = filteredOrders.map((order) => ({
       "Order ID": order.orderId,
-      Tanggal: new Date(order.createdAt).toLocaleDateString("id-ID"),
-      Waktu: new Date(order.createdAt).toLocaleTimeString("id-ID"),
-      "Nama Pelanggan": order.customerName,
-      "No. WhatsApp": order.customerPhone,
+      Date: new Date(order.createdAt).toLocaleDateString("en-US"),
+      Time: new Date(order.createdAt).toLocaleTimeString("en-US"),
+      "Customer Name": order.customerName,
+      "WhatsApp No.": order.customerPhone,
       Status: order.status.toUpperCase(),
-      "Total Bayar": order.totalPrice,
-      "Rincian Menu": (order.items || [])
+      "Total Paid": order.totalPrice,
+      "Menu Details": (order.items || [])
         .map((i) => {
           const showVariant = !i.name
             .toLowerCase()
@@ -201,10 +219,10 @@ export default function AdminOrders({
       { wch: 80 },
     ];
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Penjualan");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sales Report");
     XLSX.writeFile(
       workbook,
-      `Laporan_RuangNadi_${new Date().toISOString().split("T")[0]}.xlsx`
+      `Report_RuangNadi_${new Date().toISOString().split("T")[0]}.xlsx`,
     );
   };
 
@@ -219,7 +237,7 @@ export default function AdminOrders({
             <div className="relative">
               <input
                 type="text"
-                placeholder="Cari Customer..."
+                placeholder="Search Customer..."
                 value={orderSearchTerm}
                 onChange={(e) => setOrderSearchTerm(e.target.value)}
                 className="pl-9 pr-4 py-2 bg-white border border-stone-200 rounded-xl text-sm outline-none focus:border-amber-600 w-48 transition-all"
@@ -239,7 +257,7 @@ export default function AdminOrders({
                     : "text-stone-400 hover:bg-stone-50"
                 }`}
               >
-                Harian
+                Daily
               </button>
               <button
                 onClick={() => setOrderFilterType("monthly")}
@@ -249,7 +267,7 @@ export default function AdminOrders({
                     : "text-stone-400 hover:bg-stone-50"
                 }`}
               >
-                Bulanan
+                Monthly
               </button>
             </div>
 
@@ -306,7 +324,7 @@ export default function AdminOrders({
           ))
         ) : filteredOrders.length === 0 ? (
           <div className="text-center py-10 bg-white rounded-3xl border border-stone-100">
-            <p className="text-stone-400 italic">Belum ada pesanan.</p>
+            <p className="text-stone-400 italic">No orders yet.</p>
           </div>
         ) : (
           filteredOrders.map((order) => (
@@ -329,10 +347,10 @@ export default function AdminOrders({
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] font-black uppercase text-stone-400 tracking-widest">
-                    Waktu
+                    Time
                   </span>
                   <p className="text-xs text-stone-600">
-                    {new Date(order.createdAt).toLocaleString("id-ID", {
+                    {new Date(order.createdAt).toLocaleString("en-US", {
                       hour: "2-digit",
                       minute: "2-digit",
                       day: "numeric",
@@ -390,10 +408,10 @@ export default function AdminOrders({
                                       order.status === "success"
                                         ? "bg-emerald-100 text-emerald-800"
                                         : order.status === "pending"
-                                        ? "bg-amber-100 text-amber-800"
-                                        : order.status === "completed"
-                                        ? "bg-stone-200 text-stone-500"
-                                        : "bg-rose-100 text-rose-800"
+                                          ? "bg-amber-100 text-amber-800"
+                                          : order.status === "completed"
+                                            ? "bg-stone-200 text-stone-500"
+                                            : "bg-rose-100 text-rose-800"
                                     }`}
                   >
                     <option value="pending">Pending</option>
@@ -418,7 +436,7 @@ export default function AdminOrders({
             <thead className="bg-stone-50 border-b border-stone-100 text-xs font-bold uppercase tracking-widest text-stone-500">
               <tr>
                 <th className="p-6">Order ID</th>
-                <th className="p-6">Tanggal</th>
+                <th className="p-6">Date</th>
                 <th className="p-6">Customer</th>
                 <th className="p-6">Items</th>
                 <th className="p-6">Total</th>
@@ -428,7 +446,7 @@ export default function AdminOrders({
                     onChange={(e) => setFilterStatus(e.target.value)}
                     className="bg-transparent text-xs font-bold uppercase tracking-widest text-stone-500 outline-none cursor-pointer"
                   >
-                    <option value="Semua">STATUS (ALL)</option>
+                    <option value="All">STATUS (ALL)</option>
                     <option value="pending">PENDING</option>
                     <option value="success">PROCESS</option>
                     <option value="completed">COMPLETED</option>
@@ -470,7 +488,7 @@ export default function AdminOrders({
               ) : filteredOrders.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-10 text-center text-stone-400">
-                    Belum ada pesanan masuk.
+                    No incoming orders yet.
                   </td>
                 </tr>
               ) : (
@@ -487,7 +505,7 @@ export default function AdminOrders({
                       {order.orderId}
                     </td>
                     <td className="p-6 text-sm text-stone-600">
-                      {new Date(order.createdAt).toLocaleString("id-ID", {
+                      {new Date(order.createdAt).toLocaleString("en-US", {
                         day: "numeric",
                         month: "short",
                         hour: "2-digit",
@@ -535,10 +553,10 @@ export default function AdminOrders({
                                       order.status === "success"
                                         ? "bg-emerald-100 text-emerald-800"
                                         : order.status === "pending"
-                                        ? "bg-amber-100 text-amber-800"
-                                        : order.status === "completed"
-                                        ? "bg-stone-200 text-stone-500"
-                                        : "bg-rose-100 text-rose-800"
+                                          ? "bg-amber-100 text-amber-800"
+                                          : order.status === "completed"
+                                            ? "bg-stone-200 text-stone-500"
+                                            : "bg-rose-100 text-rose-800"
                                     }`}
                       >
                         <option value="pending">Pending</option>

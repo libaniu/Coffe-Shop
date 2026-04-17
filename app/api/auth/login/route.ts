@@ -8,25 +8,14 @@ export async function POST(request: Request) {
     const { username, password } = await request.json();
     await connectDB();
 
-    console.log(
-      "LOG POSISI: Sedang berada di database bernama ->",
-      mongoose.connection.db?.databaseName,
-    );
-
-    // DEBUG: Cek apakah koneksi ke database mana
-    console.log("Mencoba login untuk:", username);
-
     const admin = await Admin.findOne({ username: username?.trim() }); // Gunakan trim() untuk jaga-jaga ada spasi
 
     if (!admin) {
-      console.log("HASIL: User tidak ditemukan di database.");
       return NextResponse.json(
         { message: "Username tidak terdaftar" },
         { status: 401 },
       );
     }
-
-    console.log("HASIL: User ditemukan. Membandingkan password...");
 
     if (admin.password !== password) {
       return NextResponse.json({ message: "Password salah" }, { status: 401 });

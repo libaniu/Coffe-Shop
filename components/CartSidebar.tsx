@@ -84,8 +84,6 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
       if (data.token) {
         window.snap.pay(data.token, {
           onSuccess: (result: any) => {
-            console.log("Success:", result);
-
             // Notifikasi Sukses
             if (onShowToast)
               onShowToast("Pembayaran Berhasil! Mengalihkan...", "success");
@@ -99,7 +97,6 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
             router.push(`/order/${result.order_id}`);
           },
           onPending: (result: any) => {
-            console.log("Pending:", result);
             if (onShowToast) onShowToast("Menunggu Pembayaran...", "warning");
           },
           onError: (result: any) => {

@@ -33,7 +33,6 @@ export const connectDB = async () => {
     };
 
     cached!.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log("✅ Berhasil konek ke MongoDB");
       return mongoose;
     });
   }
